@@ -1,41 +1,48 @@
-# Yang Theory
+# Yang Theory — film review
 
-The working landing page is `index.html`. The original V9 prototype and all six source media files are retained unchanged.
+`review.html` and the site root open the normal-playback review page. A single
+offline-rendered MP4 contains the complete edit; the page does not use WebGL,
+ScrollTrigger, multiple video elements, or scroll seeking.
 
-## Run
+Use **PLAY FILM**, the native video controls, Pause/Resume, Replay and the native
+scrub bar. The movie is 31.2 seconds, 1920×1080 at 30 fps, H.264 High Profile,
+CRF 17, with a fast-start MP4 header. No audio was added.
+
+## Development and static build
 
 Requires Node.js 20.19+ or 22.12+.
 
 ```sh
 npm ci
 npm run dev
-```
-
-Open the address printed by Vite. Scroll normally, use the scrollbar, or use the browser's keyboard navigation. The hero pins one stage; its real video frames and selective WebGL composites follow document scroll in both directions. Native media proportions and a device-pixel-aware size cap protect foreground quality. There are no wheel interception, gesture locks, automatic chapter jumps, or primary opacity crossfades.
-
-```sh
 npm run build
-npm run preview
 ```
 
-`dist/` is the production site and can be served by any static web host. Asset URLs are relative, so subdirectory hosting is supported. Live playback requires HTTP(S), rather than opening the module-based HTML with `file://`.
+Serve the generated `dist/` directory. Both `index.html` and `review.html` are
+built entries. `public/film/` is copied into `dist/film/`; all links are relative
+and support the repository's GitHub Pages subdirectory.
 
-## Media and edit
+## Render the film
 
-- Zaru → Journey → Seek Magic → Ophelia → Shila → Burton / Behind the world.
-- `cinematic.js` owns the scroll edit, source time ranges, and copy cues.
-- `film-renderer.js` owns proportional framing, native-pixel limits, and texture uploads.
-- `film-shaders.js` owns the selective light/gradient transitions. The portrait foreground is never blurred; only luminance control signals are averaged. Shila's exterior background is matted, preserving its painted interior.
-- Burton's flight and laptop/maker reveal remain one source video with no added internal transition.
-- `editorial.css` and the lower-page markup retain V9's existing presentation. Images in `assets/original-editorial-*` are decoded copies of V9's embedded originals, without re-encoding.
-- Reduced-motion mode uses static source moments and chapter cuts while preserving native scroll access to all six works.
-
-## Browser validation
-
-With Python Playwright and Chromium installed, start the production preview, then run:
+The movie is committed, so building and watching require no rendering tools.
+To reproduce it, install FFmpeg and Python with NumPy, Pillow and SciPy:
 
 ```sh
-python scripts/check_hero.py http://127.0.0.1:4173
+python scripts/render_review_film.py
 ```
 
-The check visits all six beats and five transition midpoints, verifies frame seeking and reverse-scroll pixel determinism, checks mobile/reduced-motion behavior and the CTA handoff, and fails on browser errors or missing resources. Outputs stay outside the repository in `/tmp/yang-hero-checks`.
+The renderer reads the repository's original videos and unchanged transparent
+PNG. It downsamples foreground media, preserves their proportions and colors,
+and composites transition masks offline. Journey fills the 1080p environment;
+Ophelia has a sharp 432×768 foreground and a separate surrounding field sampled
+from its own background; Shila is matted out of its source canvas and shown at
+a smaller size on `#f4e9e1`. Seek Magic uses `#f3e9dd`. Zaru starts at source
+time zero in black, framed with substantial negative space.
+
+`public/film/yang-theory-film.json` records original asset SHA-256 hashes,
+source ranges and transition intervals. The last source plays continuously from
+its beginning through Burton's flight, the laptop and the maker. No internal
+transition was added.
+
+The former scroll prototype remains archived as `scroll-prototype.html`, with
+its renderer files and source assets unchanged. It is not the review player.

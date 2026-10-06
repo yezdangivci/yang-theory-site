@@ -1,0 +1,47 @@
+name: Verify live film review
+
+on:
+  push:
+    branches: [yang-theory-film-review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify deployed page, exact film bytes and byte-range playback
+        run: |
+          python - <<'PY'
+          import hashlib, pathlib, time, urllib.request
+          base = 'https://yezdangivci.github.io/yang-theory-site/'
+          expected = hashlib.sha256(pathlib.Path('public/film/yang-theory-film.mp4').read_bytes()).hexdigest()
+          for attempt in range(45):
+              try:
+                  with urllib.request.urlopen(base + 'review.html', timeout=30) as response:
+                      assert response.status == 200
+                      page = response.read().decode()
+                      assert 'PLAY FILM' in page and 'film/yang-theory-film.mp4' in page
+                  digest = hashlib.sha256()
+                  with urllib.request.urlopen(base + 'film/yang-theory-film.mp4', timeout=30) as response:
+                      assert response.status == 200
+                      assert response.headers.get_content_type() == 'video/mp4'
+                      while chunk := response.read(1024 * 1024):
+                          digest.update(chunk)
+                  assert digest.hexdigest() == expected, 'Published film is not this commit\'s render'
+                  request = urllib.request.Request(base + 'film/yang-theory-film.mp4', headers={'Range': 'bytes=0-1023'})
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      assert response.status == 206, 'Video byte-range delivery is unavailable'
+                      assert len(response.read()) == 1024
+                  print('LIVE_REVIEW_VERIFIED', base + 'review.html', expected)
+                  break
+              except Exception as error:
+                  if attempt == 44:
+                      raise
+                  print('Waiting for Pages deployment:', error, flush=True)
+                  time.sleep(10)
+          PY
