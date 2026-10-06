@@ -1,30 +1,54 @@
 {
-  "output": "yang-theory-film.mp4",
   "width": 1920,
   "height": 1080,
   "fps": 30,
-  "duration": 31.2,
-  "transitions": [
-    [
-      6.2,
-      8.0
-    ],
-    [
-      9.8,
-      11.2
-    ],
-    [
-      14.4,
-      16.0
-    ],
-    [
-      20.0,
-      21.6
-    ],
-    [
-      24.1,
-      25.7
-    ]
+  "frames": 1573,
+  "duration": 52.43333333333333,
+  "starts": {
+    "Zaru": 0.0,
+    "Journey": 15.1,
+    "Seek Magic": 20.166666666666668,
+    "Ophelia": 24.666666666666668,
+    "Shila": 39.43333333333333,
+    "Burton": 45.3
+  },
+  "chapters": [
+    {
+      "index": 0,
+      "name": "Zaru",
+      "start": 0.0,
+      "end": 15.1
+    },
+    {
+      "index": 1,
+      "name": "Journey",
+      "start": 15.1,
+      "end": 20.166666666666668
+    },
+    {
+      "index": 2,
+      "name": "Seek Magic",
+      "start": 20.166666666666668,
+      "end": 24.666666666666668
+    },
+    {
+      "index": 3,
+      "name": "Ophelia",
+      "start": 24.666666666666668,
+      "end": 39.43333333333333
+    },
+    {
+      "index": 4,
+      "name": "Shila",
+      "start": 39.43333333333333,
+      "end": 45.3
+    },
+    {
+      "index": 5,
+      "name": "Burton",
+      "start": 45.3,
+      "end": 52.43333333333333
+    }
   ],
   "source_sha256": {
     "zaru_3_web.mp4": "e919d3fbb172c24d8abfeae3e23d0b13cd950c2674836ac2f43d8bb0595eb55c",
@@ -34,27 +58,60 @@
     "shila_lastvideo.mp4": "a7125db3a74169073cc40b7dacf5c6770fb518459ba26eb101eb746441e12b11",
     "yez_ekran_final_web.mp4": "f804d6048e11c7bcabbcb52d2d51dfe4307aa41748d5617477b3b8db5f417f78"
   },
-  "source_ranges": {
-    "Zaru": [
+  "complete_source_ranges": {
+    "zaru_3_web.mp4": [
       0,
-      8
+      15.090998
     ],
-    "Journey": [
+    "Journey:Yez Startle video.mp4": [
       0,
-      5
+      5.061995
     ],
-    "Seek Magic": "original unchanged transparent PNG",
-    "Ophelia": [
-      0.5,
-      7.7
-    ],
-    "Shila": [
+    "ophelia_landing_916_web.mp4": [
       0,
-      5.7
+      14.766009
     ],
-    "Burton / maker": [
+    "shila_lastvideo.mp4": [
       0,
-      7.1
+      5.866667
+    ],
+    "yez_ekran_final_web.mp4": [
+      0,
+      7.127007
     ]
+  },
+  "events": [
+    "resin portal \u2192 local breakout \u2192 cut",
+    "plant reaction \u2192 short optical peak \u2192 orb cut",
+    "orb specular event \u2192 cut \u2192 jewelry glint",
+    "pendant \u2192 painted object hard cut",
+    "painted eye \u2192 aligned living eye hard cut"
+  ],
+  "table": {
+    "native_alpha_bounds": [
+      644,
+      81,
+      1899,
+      1344
+    ],
+    "visible_center": [
+      960,
+      540
+    ],
+    "fixed_height": 780,
+    "temporal_alpha_change": false
+  },
+  "gaze_match": {
+    "eye": [
+      838.0,
+      294.0
+    ],
+    "maximum_clock_height_fraction": 0.817,
+    "restrained_scale_ratio": 1.0397111913357402
+  },
+  "scrub": {
+    "gop_frames": 6,
+    "keyframe_interval_seconds": 0.2,
+    "same_edit_as_review": true
   }
 }
