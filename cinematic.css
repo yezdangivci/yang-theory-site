@@ -1,0 +1,58 @@
+html { scroll-behavior: auto; }
+body { background: #f4e9e1; }
+.film { position: relative; background: #030405; }
+.film-stage { position: relative; width: 100%; height: 100svh; min-height: 520px; overflow: hidden; isolation: isolate; background: #000; }
+#filmCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.film-copy { position: absolute; z-index: 3; left: clamp(22px, 5.4vw, 96px); bottom: clamp(76px, 11vh, 130px); max-width: min(450px, 40vw); color: #f4e9e1; pointer-events: none; }
+.film-eyebrow { margin: 0 0 16px; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; }
+.film-copy h1 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; letter-spacing: -.052em; font-size: clamp(48px, 6.7vw, 102px); line-height: .96; margin: 0 0 19px; }
+.film-subtitle { margin: 0; max-width: 340px; font-size: 13px; line-height: 1.65; letter-spacing: .02em; }
+.film-copy.is-light { color: #27211e; }
+.film-copy:not(.is-light) { text-shadow: 0 2px 16px rgba(0,0,0,.55); }
+.film-copy.is-maker h1 { font-size: clamp(43px, 5.6vw, 86px); }
+.film-cta { display: inline-flex; align-items: center; gap: 40px; margin-top: 22px; padding: 12px 0; border-bottom: 1px solid currentColor; font-size: 10px; text-transform: uppercase; letter-spacing: .17em; text-decoration: none; pointer-events: auto; }
+.film-cta[hidden] { display: none; }
+.film-cta span { font-size: 19px; }
+.film-cta:focus-visible, .film-retry:focus-visible { outline: 2px solid #b99570; outline-offset: 5px; }
+.film-meta { position: absolute; z-index: 3; bottom: 28px; left: clamp(22px, 5.4vw, 96px); right: clamp(22px, 5.4vw, 96px); display: flex; align-items: center; gap: 22px; font-size: 9px; text-transform: uppercase; letter-spacing: .19em; color: #e8e0d5; }
+.film-meta.is-light { color: #43372e; }
+.film-progress { width: clamp(84px, 11vw, 170px); height: 1px; background: currentColor; opacity: .7; position: relative; }
+.film-progress i { display: block; position: absolute; top: -1px; left: 0; width: 100%; height: 3px; background: currentColor; transform: scaleX(0); transform-origin: left; }
+#filmHint { margin-left: auto; }
+.film-loading { position: absolute; z-index: 9; inset: 0; display: grid; align-content: center; justify-content: center; gap: 15px; background: #030405; color: #f4e9e1; text-align: center; }
+.film-loading span { font: 18px Georgia, serif; letter-spacing: .25em; }
+.film-loading small { font-size: 9px; text-transform: uppercase; letter-spacing: .2em; opacity: .65; }
+.film-loading[hidden] { display: none; }
+.film-retry { position: absolute; z-index: 10; bottom: 24%; left: 50%; transform: translateX(-50%); background: transparent; border: 1px solid #e4d9ce; padding: 12px 20px; color: #e4d9ce; cursor: pointer; }
+.film-stage .film-copy, .film-stage .film-meta { visibility: hidden; }
+.film-stage.is-ready .film-copy, .film-stage.is-ready .film-meta { visibility: visible; }
+.site-header { z-index: 70; }
+.site-header.film-light { color: #27211e; background: transparent; border-color: transparent; backdrop-filter: none; }
+.site-header.in-film { color: #fff !important; mix-blend-mode: difference; background: transparent; border-color: transparent; backdrop-filter: none; }
+.film-media-bin { position: fixed; left: -2px; top: -2px; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
+.film-media-bin video { width: 1px; height: 1px; }
+@media (max-width: 820px) {
+  .film-copy { max-width: 40vw; left: 24px; }
+  .film-copy h1 { font-size: clamp(42px, 7.8vw, 74px); }
+  .film-subtitle { font-size: 11px; }
+}
+@media (max-width: 600px) {
+  .film-stage { min-height: 460px; }
+  .film-copy { left: 24px; bottom: 78px; max-width: calc(100% - 48px); }
+  .film-copy h1 { font-size: clamp(43px, 12vw, 65px); margin-bottom: 12px; }
+  .film-copy.is-maker h1 { font-size: 45px; }
+  .film-eyebrow { font-size: 8px; margin-bottom: 12px; }
+  .film-subtitle { max-width: 270px; font-size: 11px; }
+  .film-meta { left: 24px; right: 24px; bottom: 24px; gap: 14px; font-size: 8px; }
+  .film-cta { margin-top: 14px; }
+}
+@media (max-height: 580px) and (min-width: 601px) {
+  .film-stage { min-height: 360px; }
+  .film-copy { bottom: 68px; }
+  .film-copy h1 { font-size: 46px; }
+  .film-subtitle { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .film-progress, #filmHint { display: none; }
+  .film-stage { min-height: 460px; }
+}
