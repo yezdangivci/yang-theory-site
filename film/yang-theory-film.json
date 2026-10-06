@@ -1,0 +1,60 @@
+{
+  "output": "yang-theory-film.mp4",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 31.2,
+  "transitions": [
+    [
+      6.2,
+      8.0
+    ],
+    [
+      9.8,
+      11.2
+    ],
+    [
+      14.4,
+      16.0
+    ],
+    [
+      20.0,
+      21.6
+    ],
+    [
+      24.1,
+      25.7
+    ]
+  ],
+  "source_sha256": {
+    "zaru_3_web.mp4": "e919d3fbb172c24d8abfeae3e23d0b13cd950c2674836ac2f43d8bb0595eb55c",
+    "Journey:Yez Startle video.mp4": "af3194e2f340a0e71b5a994a48565c5a1f609fd27c503a8bd7a7d94d065d68c7",
+    "seek_magic_table.png": "a955346f00b8873891ff683b171fef20b0d74c2c39eb47141f8430dbfe811046",
+    "ophelia_landing_916_web.mp4": "5d55dc00d8a49c52c28b1987bb31723cbb344b9870dc4d9fd886bc53868e0c8f",
+    "shila_lastvideo.mp4": "a7125db3a74169073cc40b7dacf5c6770fb518459ba26eb101eb746441e12b11",
+    "yez_ekran_final_web.mp4": "f804d6048e11c7bcabbcb52d2d51dfe4307aa41748d5617477b3b8db5f417f78"
+  },
+  "source_ranges": {
+    "Zaru": [
+      0,
+      8
+    ],
+    "Journey": [
+      0,
+      5
+    ],
+    "Seek Magic": "original unchanged transparent PNG",
+    "Ophelia": [
+      0.5,
+      7.7
+    ],
+    "Shila": [
+      0,
+      5.7
+    ],
+    "Burton / maker": [
+      0,
+      7.1
+    ]
+  }
+}
