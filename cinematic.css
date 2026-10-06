@@ -2,7 +2,9 @@ html { scroll-behavior: auto; }
 body { background: #f4e9e1; }
 .film { position: relative; background: #030405; }
 .film-stage { position: relative; width: 100%; height: 100svh; min-height: 520px; overflow: hidden; isolation: isolate; background: #000; }
-#filmCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.film-video { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: contain; }
+.film-stage[data-ground="table"] { background: #f3e9dd; }
+.film-stage[data-ground="ivory"] { background: #f4e9e1; }
 .film-copy { position: absolute; z-index: 3; left: clamp(22px, 5.4vw, 96px); bottom: clamp(76px, 11vh, 130px); max-width: min(450px, 40vw); color: #f4e9e1; pointer-events: none; }
 .film-eyebrow { margin: 0 0 16px; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; }
 .film-copy h1 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; letter-spacing: -.052em; font-size: clamp(48px, 6.7vw, 102px); line-height: .96; margin: 0 0 19px; }
@@ -10,6 +12,7 @@ body { background: #f4e9e1; }
 .film-copy.is-light { color: #27211e; }
 .film-copy:not(.is-light) { text-shadow: 0 2px 16px rgba(0,0,0,.55); }
 .film-copy.is-maker h1 { font-size: clamp(43px, 5.6vw, 86px); }
+.film-stage[data-scene="2"] .film-copy h1 { font-size: clamp(46px, 5.2vw, 78px); }
 .film-cta { display: inline-flex; align-items: center; gap: 40px; margin-top: 22px; padding: 12px 0; border-bottom: 1px solid currentColor; font-size: 10px; text-transform: uppercase; letter-spacing: .17em; text-decoration: none; pointer-events: auto; }
 .film-cta[hidden] { display: none; }
 .film-cta span { font-size: 19px; }
@@ -37,7 +40,10 @@ body { background: #f4e9e1; }
   .film-subtitle { font-size: 11px; }
 }
 @media (max-width: 600px) {
-  .film-stage { min-height: 460px; }
+  .film-stage { min-height: 620px; }
+  /* A dedicated cinema area keeps the entire authored frame intact. Navigation
+     and copy retain readable mobile sizes rather than scaling with the movie. */
+  .film-video { top: 92px; bottom: 250px; height: calc(100% - 342px); }
   .film-copy { left: 24px; bottom: 78px; max-width: calc(100% - 48px); }
   .film-copy h1 { font-size: clamp(43px, 12vw, 65px); margin-bottom: 12px; }
   .film-copy.is-maker h1 { font-size: 45px; }

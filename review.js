@@ -1,3 +1,5 @@
+import edit from './public/film/yang-theory-film.json';
+
 const film = document.querySelector('#film');
 const play = document.querySelector('#playFilm');
 const pause = document.querySelector('#pauseFilm');
@@ -8,12 +10,12 @@ const title = document.querySelector('#beatTitle');
 const line = document.querySelector('#beatLine');
 const beats = [
   [0, '01 / 06 — Wearable art', 'Zaru', 'A world within the stone.'],
-  [6.5, '02 / 06 — Story world', 'Journey', 'Curiosity opens another world.'],
-  [10.15, '03 / 06 — Art & objects', 'Seek Magic', 'A universe on a tabletop.'],
-  [14.8, '04 / 06 — Wearable art', 'Ophelia', 'Sculpted by hand. Defined by a red stone.'],
-  [20.35, '05 / 06 — Hand-painted objects', 'Shila', 'The timeless queen.'],
-  [24.45, '06 / 06 — Journey films', 'Burton', 'The guide takes flight.'],
-  [28.3, '06 / 06 — The studio', 'Behind the world', 'Every world begins with a maker.'],
+  [edit.starts.Journey, '02 / 06 — Story world', 'Journey', 'Curiosity opens another world.'],
+  [edit.starts['Seek Magic'], '03 / 06 — Art & objects', 'Seek Magic', 'A universe on a tabletop.'],
+  [edit.starts.Ophelia, '04 / 06 — Wearable art', 'Ophelia', 'Sculpted by hand. Defined by a red stone.'],
+  [edit.starts.Shila, '05 / 06 — Hand-painted objects', 'Shila', 'The timeless queen.'],
+  [edit.starts.Burton, '06 / 06 — Journey films', 'Burton', 'The guide takes flight.'],
+  [edit.starts.Burton + 3.8, '06 / 06 — The studio', 'Behind the world', 'Every world begins with a maker.'],
 ];
 
 function updateCopy() {
