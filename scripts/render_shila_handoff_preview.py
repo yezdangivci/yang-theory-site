@@ -24,9 +24,9 @@ W, H, FPS = 1920, 1080, 30
 IVORY = np.array([244, 233, 225], np.float32)
 OPHELIA_IN = 11.6
 OPHELIA_FRAMES = 42  # 11.6–13.0s: emit from the original red stone at 13s.
-ZOOM_FRAMES = 84
-BRIDGE_FRAMES = 48
+ZOOM_FRAMES = 108
 ZOOM_START = 16  # Begin camera motion under expanding smoke, not after it.
+BRIDGE_FRAMES = ZOOM_START+ZOOM_FRAMES  # Field and camera share the whole move.
 ZOOM_OVERLAP = BRIDGE_FRAMES-ZOOM_START
 SHILA_FRAMES = 176
 HANDOFF_FRAME = OPHELIA_FRAMES + ZOOM_START + ZOOM_FRAMES
@@ -98,19 +98,19 @@ class Handoff:
         t = index/(ZOOM_FRAMES-1)
         # Nonzero starting velocity: the emerging garment is already moving.
         # Decelerate smoothly into the unchanged full-clock composition.
-        progress = float(t+t*t-t*t*t)
+        progress = float(.30*t+2.40*t*t-1.70*t*t*t)
         final_scale = np.hypot(self.end[0, 0], self.end[1, 0])
         initial_scale = 1.0  # Tightest native-pixel framing, without upscaling.
         scale = np.exp(np.log(initial_scale)*(1-progress)+np.log(final_scale)*progress)
         # Select existing red clothing only; no new object or reframing of Ophelia.
-        red_native = np.array([1980., 3790.])  # Painted bodice below mechanism.
+        red_native = np.array([1800., 3750.])  # Red bodice, away from pivot/hem.
         matrix = self.end.copy()
         angle = np.arctan2(self.end[1, 0], self.end[0, 0])*progress
         matrix[:, :2] = [[scale*np.cos(angle), -scale*np.sin(angle)],
                         [scale*np.sin(angle), scale*np.cos(angle)]]
         # Raise the tighter bodice detail; scale and placement travel together
         # along one camera path into the unchanged centered full clock.
-        red_position = np.array([947., 535.])*(1-progress)+(self.end @ np.r_[red_native, 1])*progress
+        red_position = np.array([947., 600.])*(1-progress)+(self.end @ np.r_[red_native, 1])*progress
         matrix[:, 2] = red_position-matrix[:, :2] @ red_native
         return matrix, scale, t
 
@@ -181,9 +181,9 @@ def main():
             # Continue the same indices after the cloud; never restart at zero.
             moving_shila = match.png_frame(max(0, i-ZOOM_START))
             progress = i/(BRIDGE_FRAMES-1)
-            outgoing = ophelia(tail[min(OPHELIA_FRAMES+i, len(tail)-1)]) if progress < .38 else moving_shila
+            outgoing = ophelia(tail[min(OPHELIA_FRAMES+i, len(tail)-1)]) if progress < .148 else moving_shila
             material = bridge.frame(progress, outgoing, moving_shila)
-            if i in [6, 14, 18, 23, 28, 32, 38, 40, 47]:
+            if i in [6, 18, 25, 35, 50, 65, 80, 95, 110, 123]:
                 Image.fromarray(material.astype('uint8')).save(args.qa/f'red-smoke-{i}.png')
             write(material)
         for i in range(ZOOM_OVERLAP, ZOOM_FRAMES):
@@ -199,10 +199,10 @@ def main():
         'ophelia_source_in': OPHELIA_IN, 'red_bridge_start': OPHELIA_FRAMES/FPS,
         'red_bridge_duration': BRIDGE_FRAMES/FPS, 'png_start': (OPHELIA_FRAMES+ZOOM_START)/FPS,
         'zoom_starts_under_smoke': True, 'zoom_overlap_frames': ZOOM_OVERLAP,
-        'smoke_clear_frame': OPHELIA_FRAMES+30,
-        'formation_complete_frame': OPHELIA_FRAMES+41,
-        'initial_native_scale': 1.0, 'initial_garment_native_point': [1980, 3790],
-        'initial_garment_screen_point': [947, 535],
+        'smoke_clear_frame': OPHELIA_FRAMES+int(np.ceil(.95*(BRIDGE_FRAMES-1))),
+        'formation_complete_frame': OPHELIA_FRAMES+int(np.ceil(.96*(BRIDGE_FRAMES-1))),
+        'initial_native_scale': 1.0, 'initial_garment_native_point': [1800, 3750],
+        'initial_garment_screen_point': [947, 600],
         'video_handoff': HANDOFF_FRAME/FPS, 'video_source_in': 0, 'complete_shila_video': True,
         'original_files_sha256': hashes, 'handoff_metrics': metrics,
         'treatment': 'Original Ophelia at 13s; smoke-density matte resolves Shila visibility, contrast and texture locally while a tighter, higher garment camera moves continuously; same final clock framing and uncorrected shila_final.mp4.',

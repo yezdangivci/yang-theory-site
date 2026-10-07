@@ -29,7 +29,7 @@ jobs:
           for attempt in range(45):
               try:
                   for name in expected:
-                      url = base + name + '?v=density-formation-1'
+                      url = base + name + '?v=integrated-transformation-1'
                       with urllib.request.urlopen(url, timeout=30) as response:
                           assert response.status == 200
                           data = response.read()
