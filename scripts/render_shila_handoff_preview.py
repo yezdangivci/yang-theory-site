@@ -2,7 +2,7 @@
 """Short Ophelia / original-PNG zoom-out / moving-hands review, not a hero render.
 
 Requires numpy, Pillow and opencv-python-headless, plus ffmpeg.
-The ruby-to-garment bridge is a correspondence / material morph. The approved
+The ruby-to-garment bridge is a separate soft red smoke burst. The approved
 Shila zoom-out follows it unchanged. Shila colors are not corrected: the user
 supplied the corrected shila_final.mp4. Existing clock hands play uninterrupted.
 """
@@ -15,16 +15,16 @@ from pathlib import Path
 import cv2
 import numpy as np
 from PIL import Image
-from red_material_bridge import RedMaterialBridge
+from red_smoke_bridge import RedSmokeBridge
 cv2.setNumThreads(2)
 
 ROOT = Path(__file__).resolve().parents[1]
 W, H, FPS = 1920, 1080, 30
 IVORY = np.array([244, 233, 225], np.float32)
 OPHELIA_IN = 11.6
-OPHELIA_FRAMES = 95
+OPHELIA_FRAMES = 42  # 11.6–13.0s: emit from the original red stone at 13s.
 ZOOM_FRAMES = 84
-BRIDGE_FRAMES = 27
+BRIDGE_FRAMES = 48
 SHILA_FRAMES = 176
 HANDOFF_FRAME = OPHELIA_FRAMES + BRIDGE_FRAMES + ZOOM_FRAMES
 SCALE = .831
@@ -167,19 +167,19 @@ def main():
         if count % 30 == 0:
             print(f'Rendered section preview {count/FPS:.1f}s', flush=True)
     tail = list(decode('ophelia_landing_916_web.mp4', OPHELIA_IN, (486, 864)))
-    outgoing = ophelia(tail[-1])
     incoming = match.png_frame(0)
-    native_tail = list(decode('ophelia_landing_916_web.mp4', 14.65, (1080, 1920)))
-    bridge = RedMaterialBridge(outgoing, incoming, native_tail[-1], match.png, match.png_matrix(0)[0])
-    assert np.array_equal(bridge.frame(0), outgoing)
-    assert np.array_equal(bridge.frame(1), incoming)
+    bridge = RedSmokeBridge(origin=(947, 760))
+    assert np.array_equal(bridge.frame(0, ophelia(tail[OPHELIA_FRAMES]), incoming), ophelia(tail[OPHELIA_FRAMES]))
+    assert np.array_equal(bridge.frame(1, ophelia(tail[-1]), incoming), incoming)
     try:
         for i in range(OPHELIA_FRAMES):
             write(ophelia(tail[min(i, len(tail)-1)]))
         for i in range(BRIDGE_FRAMES):
-            material = bridge.frame(i/(BRIDGE_FRAMES-1))
-            if i in [6, 13, 20]:
-                Image.fromarray(material.astype('uint8')).save(args.qa/f'red-bridge-{i}.png')
+            # Continue original Ophelia movement until hidden by opaque smoke.
+            outgoing = ophelia(tail[min(OPHELIA_FRAMES+i, len(tail)-1)]) if i < BRIDGE_FRAMES//2 else incoming
+            material = bridge.frame(i/(BRIDGE_FRAMES-1), outgoing, incoming)
+            if i in [6, 14, 23, 24, 32, 40]:
+                Image.fromarray(material.astype('uint8')).save(args.qa/f'red-smoke-{i}.png')
             write(material)
         for i in range(ZOOM_FRAMES):
             write(match.png_frame(i))
@@ -195,11 +195,13 @@ def main():
         'red_bridge_duration': BRIDGE_FRAMES/FPS, 'png_start': (OPHELIA_FRAMES+BRIDGE_FRAMES)/FPS,
         'video_handoff': HANDOFF_FRAME/FPS, 'video_source_in': 0, 'complete_shila_video': True,
         'original_files_sha256': hashes, 'handoff_metrics': metrics,
-        'treatment': 'Red-fold / brush-stroke correspondence material morph; approved original-PNG zoom-out; uncorrected shila_final.mp4 from frame zero.',
+        'treatment': 'Original Ophelia at 13s; separate soft ruby-red smoke obscures intact source shots; approved original-PNG zoom-out; uncorrected shila_final.mp4 from frame zero.',
+        'ophelia_smoke_source_time': OPHELIA_IN+OPHELIA_FRAMES/FPS,
+        'source_deformation': False, 'shot_crossfade': False,
         'shila_color_correction': False, 'approved_zoom_frames': ZOOM_FRAMES,
         'full_hero_rendered': False}
     args.output.with_suffix('.json').write_text(json.dumps(metadata, indent=2)+'\n')
-    subprocess.run(['ffmpeg', '-v', 'error', '-ss', '4.7', '-i', str(args.output), '-frames:v', '1',
+    subprocess.run(['ffmpeg', '-v', 'error', '-ss', '1.5', '-i', str(args.output), '-frames:v', '1',
                     '-q:v', '2', '-y', str(args.output.with_name('poster.jpg'))], check=True)
     print(json.dumps(metadata, indent=2), flush=True)
 
