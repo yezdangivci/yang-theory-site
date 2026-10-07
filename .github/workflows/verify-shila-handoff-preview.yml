@@ -1,0 +1,49 @@
+name: Verify live Shila handoff preview
+
+on:
+  push:
+    branches: [yang-theory-film-review]
+    paths:
+      - public/previews/shila-handoff/**
+      - scripts/render_shila_handoff_preview.py
+      - .github/workflows/verify-shila-handoff-preview.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify published player, exact preview movie and native byte-range playback
+        run: |
+          python - <<'PY'
+          import hashlib, pathlib, time, urllib.request
+          root = pathlib.Path('public/previews/shila-handoff')
+          base = 'https://yezdangivci.github.io/yang-theory-site/previews/shila-handoff/'
+          expected = {name: hashlib.sha256((root/name).read_bytes()).hexdigest() for name in ['index.html', 'preview.mp4', 'preview.json']}
+          for attempt in range(45):
+              try:
+                  for name in expected:
+                      url = base + name + '?v=shila-handoff-1'
+                      with urllib.request.urlopen(url, timeout=30) as response:
+                          assert response.status == 200
+                          data = response.read()
+                          assert hashlib.sha256(data).hexdigest() == expected[name], 'Published preview is not this commit'
+                          if name == 'preview.mp4':
+                              assert response.headers.get_content_type() == 'video/mp4'
+                          if name == 'index.html':
+                              assert b'PLAY PREVIEW' in data and b'Replay handoff' in data
+                  with urllib.request.urlopen(urllib.request.Request(base+'preview.mp4', headers={'Range': 'bytes=0-1023'}), timeout=30) as response:
+                      assert response.status == 206 and len(response.read()) == 1024
+                  print('LIVE_SHILA_HANDOFF_PREVIEW_VERIFIED', base, expected)
+                  break
+              except Exception as error:
+                  if attempt == 44:
+                      raise
+                  print('Waiting for preview deployment:', error, flush=True)
+                  time.sleep(10)
+          PY
