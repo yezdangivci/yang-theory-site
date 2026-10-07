@@ -6,6 +6,7 @@ on:
     paths:
       - public/previews/shila-handoff/**
       - scripts/render_shila_handoff_preview.py
+      - scripts/red_material_bridge.py
       - .github/workflows/verify-shila-handoff-preview.yml
   workflow_dispatch:
 
@@ -28,7 +29,7 @@ jobs:
           for attempt in range(45):
               try:
                   for name in expected:
-                      url = base + name + '?v=shila-handoff-1'
+                      url = base + name + '?v=red-bridge-1'
                       with urllib.request.urlopen(url, timeout=30) as response:
                           assert response.status == 200
                           data = response.read()
@@ -36,7 +37,7 @@ jobs:
                           if name == 'preview.mp4':
                               assert response.headers.get_content_type() == 'video/mp4'
                           if name == 'index.html':
-                              assert b'PLAY PREVIEW' in data and b'Replay handoff' in data
+                              assert b'PLAY PREVIEW' in data and b'Replay red transition' in data
                   with urllib.request.urlopen(urllib.request.Request(base+'preview.mp4', headers={'Range': 'bytes=0-1023'}), timeout=30) as response:
                       assert response.status == 206 and len(response.read()) == 1024
                   print('LIVE_SHILA_HANDOFF_PREVIEW_VERIFIED', base, expected)

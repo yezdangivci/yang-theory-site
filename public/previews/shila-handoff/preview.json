@@ -2,32 +2,35 @@
   "width": 1920,
   "height": 1080,
   "fps": 30,
-  "frames": 355,
-  "duration": 11.833333333333334,
+  "frames": 382,
+  "duration": 12.733333333333333,
   "ophelia_source_in": 11.6,
-  "png_start": 3.1666666666666665,
-  "technical_match_start": 4.992666666666667,
-  "video_handoff": 5.966666666666667,
+  "red_bridge_start": 3.1666666666666665,
+  "red_bridge_duration": 0.9,
+  "png_start": 4.066666666666666,
+  "video_handoff": 6.866666666666666,
   "video_source_in": 0,
   "complete_shila_video": true,
   "original_files_sha256": {
     "shila_original.png": "54531cb4b0b3edfe01e888368f359a639adedcdedb29f3690a719cf982ed40d5",
-    "shila_lastvideo.mp4": "a7125db3a74169073cc40b7dacf5c6770fb518459ba26eb101eb746441e12b11",
+    "shila_final.mp4": "790f8e1c281ead69142981bd5d26fb39314bb27d9302a598397956a666110f3d",
     "ophelia_landing_916_web.mp4": "5d55dc00d8a49c52c28b1987bb31723cbb344b9870dc4d9fd886bc53868e0c8f"
   },
   "handoff_metrics": {
     "mean_rgb_absolute_error": [
-      7.399472236633301,
-      5.679378509521484,
-      8.916836738586426
+      11.419410705566406,
+      7.958704948425293,
+      12.770926475524902
     ],
     "median_rgb_absolute_error": [
-      5.031257629394531,
-      4.1573486328125,
-      5.462493896484375
+      8.378665924072266,
+      5.987261772155762,
+      9.385858535766602
     ],
     "registration_median_error_px": 0.7612966299057007
   },
-  "treatment": "Same PNG: reference-calibrated RGB tone/color coefficients, smooth local illumination compensation, optical softness; then a direct frame-zero video switch.",
+  "treatment": "Red-fold / brush-stroke correspondence material morph; approved original-PNG zoom-out; uncorrected shila_final.mp4 from frame zero.",
+  "shila_color_correction": false,
+  "approved_zoom_frames": 84,
   "full_hero_rendered": false
 }
