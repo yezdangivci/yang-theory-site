@@ -2,8 +2,8 @@
 """Short Ophelia / original-PNG zoom-out / moving-hands review, not a hero render.
 
 Requires numpy, Pillow and opencv-python-headless, plus ffmpeg.
-The ruby-to-garment bridge is a separate soft red smoke burst. The approved
-Shila zoom-out follows it unchanged. Shila colors are not corrected: the user
+The ruby smoke dispersal and Shila camera move overlap on one timeline. The
+full-clock framing is retained. Shila colors are not corrected: the user
 supplied the corrected shila_final.mp4. Existing clock hands play uninterrupted.
 """
 import argparse
@@ -25,8 +25,10 @@ OPHELIA_IN = 11.6
 OPHELIA_FRAMES = 42  # 11.6–13.0s: emit from the original red stone at 13s.
 ZOOM_FRAMES = 84
 BRIDGE_FRAMES = 48
+ZOOM_START = 16  # Begin camera motion under expanding smoke, not after it.
+ZOOM_OVERLAP = BRIDGE_FRAMES-ZOOM_START
 SHILA_FRAMES = 176
-HANDOFF_FRAME = OPHELIA_FRAMES + BRIDGE_FRAMES + ZOOM_FRAMES
+HANDOFF_FRAME = OPHELIA_FRAMES + ZOOM_START + ZOOM_FRAMES
 SCALE = .831
 
 
@@ -59,8 +61,8 @@ class Handoff:
         self.png = np.array(Image.open(ROOT/'shila_original.png').convert('RGBA'))
         self.video = list(decode('shila_final.mp4'))
         assert len(self.video) == SHILA_FRAMES
-        # Freeze the approved uniform registration and zoom path. A color-only
-        # replacement source must not subtly reframe the artwork via a new fit.
+        # Retain the approved full-clock registration; only the requested
+        # starting crop and continuous camera path change.
         self.registration = np.array([[.26562231405493836, -.000051125836463486105, 409.560024194332],
                                       [.000051125836463486105, .26562231405493836, -174.92425049722073]])
         self.registration_error = .7612966299057007
@@ -93,22 +95,21 @@ class Handoff:
 
     def png_matrix(self, index):
         t = index/(ZOOM_FRAMES-1)
-        progress = float(ease(t))
+        # Nonzero starting velocity: the emerging garment is already moving.
+        # Decelerate smoothly into the unchanged full-clock composition.
+        progress = float(t+t*t-t*t*t)
         final_scale = np.hypot(self.end[0, 0], self.end[1, 0])
-        initial_scale = .58  # < 1 native pixel per canvas pixel: no enlargement.
+        initial_scale = .90  # Tighter detail, still downsampled from native PNG.
         scale = np.exp(np.log(initial_scale)*(1-progress)+np.log(final_scale)*progress)
         # Select existing red clothing only; no new object or reframing of Ophelia.
-        red_reference = np.array([937., 758., 1.])
-        red_native = (np.linalg.inv(self.homogeneous(self.registration)) @ red_reference)[:2]
-        start = np.array([[initial_scale, 0, 960-initial_scale*red_native[0]],
-                          [0, initial_scale, 717-initial_scale*red_native[1]]])
+        red_native = np.array([1980., 3790.])  # Painted bodice below mechanism.
         matrix = self.end.copy()
         angle = np.arctan2(self.end[1, 0], self.end[0, 0])*progress
         matrix[:, :2] = [[scale*np.cos(angle), -scale*np.sin(angle)],
                         [scale*np.sin(angle), scale*np.cos(angle)]]
-        # Red detail starts in the pendant's screen region; the completed artwork
-        # ends precisely centered. This positioning belongs to the requested reveal.
-        red_position = np.array([960., 717.])*(1-progress)+(self.end @ np.r_[red_native, 1])*progress
+        # Raise the tighter bodice detail; scale and placement travel together
+        # along one camera path into the unchanged centered full clock.
+        red_position = np.array([947., 580.])*(1-progress)+(self.end @ np.r_[red_native, 1])*progress
         matrix[:, 2] = red_position-matrix[:, :2] @ red_native
         return matrix, scale, t
 
@@ -175,30 +176,37 @@ def main():
         for i in range(OPHELIA_FRAMES):
             write(ophelia(tail[min(i, len(tail)-1)]))
         for i in range(BRIDGE_FRAMES):
-            # Continue original Ophelia movement until hidden by opaque smoke.
-            outgoing = ophelia(tail[min(OPHELIA_FRAMES+i, len(tail)-1)]) if i < BRIDGE_FRAMES//2 else incoming
-            material = bridge.frame(i/(BRIDGE_FRAMES-1), outgoing, incoming)
-            if i in [6, 14, 23, 24, 32, 40]:
+            # The single camera advances every frame under the same cloud.
+            # Continue the same indices after the cloud; never restart at zero.
+            moving_shila = match.png_frame(max(0, i-ZOOM_START))
+            progress = i/(BRIDGE_FRAMES-1)
+            outgoing = ophelia(tail[min(OPHELIA_FRAMES+i, len(tail)-1)]) if progress < .38 else moving_shila
+            material = bridge.frame(progress, outgoing, moving_shila)
+            if i in [6, 14, 18, 23, 28, 32, 38, 40, 47]:
                 Image.fromarray(material.astype('uint8')).save(args.qa/f'red-smoke-{i}.png')
             write(material)
-        for i in range(ZOOM_FRAMES):
+        for i in range(ZOOM_OVERLAP, ZOOM_FRAMES):
             write(match.png_frame(i))
         for i in range(SHILA_FRAMES):
             write(match.video_frame(i))
     finally:
         encoder.stdin.close()
     assert encoder.wait() == 0
-    assert count == OPHELIA_FRAMES+BRIDGE_FRAMES+ZOOM_FRAMES+SHILA_FRAMES
+    assert count == HANDOFF_FRAME+SHILA_FRAMES
     assert all(hashlib.sha256((ROOT/n).read_bytes()).hexdigest() == h for n, h in hashes.items())
     metadata = {'width': W, 'height': H, 'fps': FPS, 'frames': count, 'duration': count/FPS,
         'ophelia_source_in': OPHELIA_IN, 'red_bridge_start': OPHELIA_FRAMES/FPS,
-        'red_bridge_duration': BRIDGE_FRAMES/FPS, 'png_start': (OPHELIA_FRAMES+BRIDGE_FRAMES)/FPS,
+        'red_bridge_duration': BRIDGE_FRAMES/FPS, 'png_start': (OPHELIA_FRAMES+ZOOM_START)/FPS,
+        'zoom_starts_under_smoke': True, 'zoom_overlap_frames': ZOOM_OVERLAP,
+        'smoke_clear_frame': OPHELIA_FRAMES+30,
+        'initial_native_scale': .90, 'initial_garment_native_point': [1980, 3790],
+        'initial_garment_screen_point': [947, 580],
         'video_handoff': HANDOFF_FRAME/FPS, 'video_source_in': 0, 'complete_shila_video': True,
         'original_files_sha256': hashes, 'handoff_metrics': metrics,
-        'treatment': 'Original Ophelia at 13s; separate soft ruby-red smoke obscures intact source shots; approved original-PNG zoom-out; uncorrected shila_final.mp4 from frame zero.',
+        'treatment': 'Original Ophelia at 13s; soft ruby smoke and tighter garment camera move overlap continuously; same final full-clock framing and uncorrected shila_final.mp4.',
         'ophelia_smoke_source_time': OPHELIA_IN+OPHELIA_FRAMES/FPS,
         'source_deformation': False, 'shot_crossfade': False,
-        'shila_color_correction': False, 'approved_zoom_frames': ZOOM_FRAMES,
+        'shila_color_correction': False, 'zoom_frames': ZOOM_FRAMES,
         'full_hero_rendered': False}
     args.output.with_suffix('.json').write_text(json.dumps(metadata, indent=2)+'\n')
     subprocess.run(['ffmpeg', '-v', 'error', '-ss', '1.5', '-i', str(args.output), '-frames:v', '1',

@@ -2,7 +2,7 @@
 
 The original portrait keeps playing underneath the emission. The image changes
 only while optically opaque smoke hides it, then that same cloud disperses over
-the exact approved garment composition. No optical flow or object deformation.
+the continuously moving garment composition. No object deformation.
 """
 import cv2
 import numpy as np
@@ -35,7 +35,7 @@ class RedSmokeBridge:
 
     def layer(self, progress):
         p = float(np.clip(progress, 0, 1))
-        expansion = float(smooth(min(p/.50, 1)))
+        expansion = float(smooth(min(p/.56, 1)))
         radius = 5+390*expansion**1.45
         ox, oy = self.origin
         nx = self.x+17*np.sin(self.y/49+p*2.0)+45*p
@@ -61,21 +61,24 @@ class RedSmokeBridge:
             density += weight*np.exp(-.5*((qx-cx)/sx)**2-.5*((qy-cy)/sy)**2)
         density *= .25+noise*1.7
         density *= float(smooth(p/.12))*1.7
-        if p > .56:
+        if p > .405:
             distance = np.sqrt(((qx-ox)/250)**2+((qy-oy)/210)**2)
-            dispersal = float(smooth((p-.56)/.44))
+            dispersal = float(smooth((p-.405)/.48))
             # Break apart dense curls instead of uniformly fading an overlay.
             clearing = .35+2.8*np.exp(-distance**2/.65)+noise*.2
             density = np.maximum(0, density-dispersal*38*clearing)
-        opacity = 1-np.exp(-density)
+        # Lower optical thickness during dispersal: curls become translucent
+        # before breaking apart, instead of clearing in a few abrupt frames.
+        thickness = 1.0-float(smooth((p-.405)/.12))*.65
+        opacity = 1-np.exp(-density*thickness)
         # A few completely occluded frames conceal the change of intact shots.
         # Texture/light stays continuous through that opaque part of the cloud.
-        occlusion = float(smooth((p-.405)/.04)*(1-smooth((p-.555)/.045)))
+        occlusion = float(smooth((p-.30)/.045)*(1-smooth((p-.405)/.055)))
         opacity += occlusion*(1-opacity)
-        if p > .56:
+        if p > .66:
             # Dissipation starts in the emission/red-garment zone, with organic
             # density variations; the cloud's fringes drift away last.
-            opacity *= float(smooth((1-p)/.15))
+            opacity *= float(smooth((.80-p)/.14))
         # Backlit volume shading, sampled from a restrained ruby-red palette.
         # Added atmosphere is independent; source colors are not graded.
         shade = np.clip((noise-.24)*1.9, 0, 1)
@@ -96,7 +99,7 @@ class RedSmokeBridge:
             return incoming.copy()
         opacity, smoke = self.layer(progress)
         # A single untouched image under the smoke, never two objects blended.
-        background = outgoing if progress < .5 else incoming
-        if .445 <= progress <= .555:
+        background = outgoing if progress < .38 else incoming
+        if .345 <= progress <= .405:
             assert np.min(opacity) > .99999, 'The shot change must be completely hidden'
         return background*(1-opacity)+smoke*opacity
