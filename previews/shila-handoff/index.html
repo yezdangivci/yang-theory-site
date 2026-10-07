@@ -28,21 +28,23 @@
     <p class="eyebrow">Section preview · 1920 × 1080 · 30 fps</p>
     <h1>Ophelia → Shila</h1>
     <div class="player">
-      <video id="film" controls playsinline preload="auto" poster="poster.jpg" aria-label="Ophelia red to Shila red detail, zoom out and moving clock hands">
-        <source src="preview.mp4?v=shila-handoff-1" type="video/mp4">
-        <a href="preview.mp4?v=shila-handoff-1">Open the section preview.</a>
+      <video id="film" controls playsinline preload="auto" poster="poster.jpg?v=red-bridge-1" aria-label="Ophelia red to Shila red detail, zoom out and moving clock hands">
+        <source src="preview.mp4?v=red-bridge-1" type="video/mp4">
+        <a href="preview.mp4?v=red-bridge-1">Open the section preview.</a>
       </video>
       <button id="play" type="button">▶ PLAY PREVIEW</button>
     </div>
     <div class="controls">
       <button id="pause" type="button" disabled>Pause</button>
       <button id="replay" type="button">Replay section</button>
-      <button id="handoff" type="button">Replay handoff</button>
+      <button id="handoff" type="button">Replay red transition</button>
+      <button id="clockHandoff" type="button">Replay clock handoff</button>
       <label class="eyebrow" for="speed">Speed</label>
       <select id="speed" aria-label="Playback speed"><option value="1">1× normal</option><option value="0.5">0.5×</option></select>
     </div>
     <p id="phase">Ophelia · original source motion</p>
-    <p class="note">Original PNG red detail → zoom out → full clock → existing moving hands.<br>The PNG-to-video switch is at <strong>5.97 seconds</strong>. “Replay handoff” starts just before it. The landing page and full review film are unchanged.</p>
+    <p class="note">Red stone → red material bridge → original PNG garment → approved zoom-out → moving hands.<br>The red bridge is at <strong>3.17–4.07 seconds</strong>. “Replay red transition” starts just before it. Shila uses the corrected source with no additional color correction.</p>
+    <p class="note"><a href="preview.mp4?v=red-bridge-1">Open the video directly</a>. The landing page and full review film are unchanged.</p>
     <p id="status" role="status" aria-live="polite"></p>
   </main>
   <footer>Yang Theory — Shila handoff test. Original source files preserved.</footer>
@@ -52,7 +54,8 @@
     play.addEventListener('click',()=>start(film.ended?0:undefined));
     pause.addEventListener('click',()=>film.paused?start():film.pause());
     document.querySelector('#replay').addEventListener('click',()=>start(0));
-    document.querySelector('#handoff').addEventListener('click',()=>start(4.9));
+    document.querySelector('#handoff').addEventListener('click',()=>start(2.65));
+    document.querySelector('#clockHandoff').addEventListener('click',()=>start(6.2));
     document.querySelector('#speed').addEventListener('change',event=>film.playbackRate=Number(event.target.value));
     film.addEventListener('play',()=>{play.hidden=true;pause.disabled=false;pause.textContent='Pause';});
     film.addEventListener('pause',()=>{pause.textContent='Resume';});
@@ -60,7 +63,7 @@
     film.addEventListener('timeupdate',()=>{
       const t=film.currentTime;
       if(!film.ended&&t<film.duration)play.hidden=true;
-      document.querySelector('#phase').textContent=t<95/30?'Ophelia · original source motion':t<179/30?'Shila · original PNG red detail and zoom-out':'Shila · original moving clock hands';
+      document.querySelector('#phase').textContent=t<95/30?'Ophelia · original source motion':t<122/30?'Red stone → red garment':t<206/30?'Shila · approved PNG zoom-out':'Shila · corrected source, original moving hands';
     });
     film.addEventListener('error',()=>status.textContent='Playback could not load. Open the preview MP4 directly from the link in the player.');
   </script>
