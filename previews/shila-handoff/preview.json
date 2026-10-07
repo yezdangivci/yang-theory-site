@@ -2,26 +2,26 @@
   "width": 1920,
   "height": 1080,
   "fps": 30,
-  "frames": 318,
-  "duration": 10.6,
+  "frames": 342,
+  "duration": 11.4,
   "ophelia_source_in": 11.6,
   "red_bridge_start": 1.4,
-  "red_bridge_duration": 1.6,
+  "red_bridge_duration": 4.133333333333334,
   "png_start": 1.9333333333333333,
   "zoom_starts_under_smoke": true,
-  "zoom_overlap_frames": 32,
-  "smoke_clear_frame": 72,
-  "formation_complete_frame": 83,
+  "zoom_overlap_frames": 108,
+  "smoke_clear_frame": 159,
+  "formation_complete_frame": 161,
   "initial_native_scale": 1.0,
   "initial_garment_native_point": [
-    1980,
-    3790
+    1800,
+    3750
   ],
   "initial_garment_screen_point": [
     947,
-    535
+    600
   ],
-  "video_handoff": 4.733333333333333,
+  "video_handoff": 5.533333333333333,
   "video_source_in": 0,
   "complete_shila_video": true,
   "original_files_sha256": {
@@ -53,6 +53,6 @@
   "source_deformation": false,
   "shot_crossfade": false,
   "shila_color_correction": false,
-  "zoom_frames": 84,
+  "zoom_frames": 108,
   "full_hero_rendered": false
 }
