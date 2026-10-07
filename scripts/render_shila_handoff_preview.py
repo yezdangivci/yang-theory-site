@@ -2,7 +2,8 @@
 """Short Ophelia / original-PNG zoom-out / moving-hands review, not a hero render.
 
 Requires numpy, Pillow and opencv-python-headless, plus ffmpeg.
-The ruby smoke dispersal and Shila camera move overlap on one timeline. The
+The smoke density resolves Shila's opacity, contrast and detail on one timeline.
+The ruby smoke dispersal and Shila camera move overlap. The
 full-clock framing is retained. Shila colors are not corrected: the user
 supplied the corrected shila_final.mp4. Existing clock hands play uninterrupted.
 """
@@ -99,7 +100,7 @@ class Handoff:
         # Decelerate smoothly into the unchanged full-clock composition.
         progress = float(t+t*t-t*t*t)
         final_scale = np.hypot(self.end[0, 0], self.end[1, 0])
-        initial_scale = .90  # Tighter detail, still downsampled from native PNG.
+        initial_scale = 1.0  # Tightest native-pixel framing, without upscaling.
         scale = np.exp(np.log(initial_scale)*(1-progress)+np.log(final_scale)*progress)
         # Select existing red clothing only; no new object or reframing of Ophelia.
         red_native = np.array([1980., 3790.])  # Painted bodice below mechanism.
@@ -109,7 +110,7 @@ class Handoff:
                         [scale*np.sin(angle), scale*np.cos(angle)]]
         # Raise the tighter bodice detail; scale and placement travel together
         # along one camera path into the unchanged centered full clock.
-        red_position = np.array([947., 580.])*(1-progress)+(self.end @ np.r_[red_native, 1])*progress
+        red_position = np.array([947., 535.])*(1-progress)+(self.end @ np.r_[red_native, 1])*progress
         matrix[:, 2] = red_position-matrix[:, :2] @ red_native
         return matrix, scale, t
 
@@ -199,11 +200,14 @@ def main():
         'red_bridge_duration': BRIDGE_FRAMES/FPS, 'png_start': (OPHELIA_FRAMES+ZOOM_START)/FPS,
         'zoom_starts_under_smoke': True, 'zoom_overlap_frames': ZOOM_OVERLAP,
         'smoke_clear_frame': OPHELIA_FRAMES+30,
-        'initial_native_scale': .90, 'initial_garment_native_point': [1980, 3790],
-        'initial_garment_screen_point': [947, 580],
+        'formation_complete_frame': OPHELIA_FRAMES+41,
+        'initial_native_scale': 1.0, 'initial_garment_native_point': [1980, 3790],
+        'initial_garment_screen_point': [947, 535],
         'video_handoff': HANDOFF_FRAME/FPS, 'video_source_in': 0, 'complete_shila_video': True,
         'original_files_sha256': hashes, 'handoff_metrics': metrics,
-        'treatment': 'Original Ophelia at 13s; soft ruby smoke and tighter garment camera move overlap continuously; same final full-clock framing and uncorrected shila_final.mp4.',
+        'treatment': 'Original Ophelia at 13s; smoke-density matte resolves Shila visibility, contrast and texture locally while a tighter, higher garment camera moves continuously; same final clock framing and uncorrected shila_final.mp4.',
+        'smoke_controls_reveal': ['opacity', 'local_contrast', 'sharpness'],
+        'clean_shila_under_smoke': False,
         'ophelia_smoke_source_time': OPHELIA_IN+OPHELIA_FRAMES/FPS,
         'source_deformation': False, 'shot_crossfade': False,
         'shila_color_correction': False, 'zoom_frames': ZOOM_FRAMES,

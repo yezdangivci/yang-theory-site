@@ -11,14 +11,15 @@
   "zoom_starts_under_smoke": true,
   "zoom_overlap_frames": 32,
   "smoke_clear_frame": 72,
-  "initial_native_scale": 0.9,
+  "formation_complete_frame": 83,
+  "initial_native_scale": 1.0,
   "initial_garment_native_point": [
     1980,
     3790
   ],
   "initial_garment_screen_point": [
     947,
-    580
+    535
   ],
   "video_handoff": 4.733333333333333,
   "video_source_in": 0,
@@ -41,7 +42,13 @@
     ],
     "registration_median_error_px": 0.7612966299057007
   },
-  "treatment": "Original Ophelia at 13s; soft ruby smoke and tighter garment camera move overlap continuously; same final full-clock framing and uncorrected shila_final.mp4.",
+  "treatment": "Original Ophelia at 13s; smoke-density matte resolves Shila visibility, contrast and texture locally while a tighter, higher garment camera moves continuously; same final clock framing and uncorrected shila_final.mp4.",
+  "smoke_controls_reveal": [
+    "opacity",
+    "local_contrast",
+    "sharpness"
+  ],
+  "clean_shila_under_smoke": false,
   "ophelia_smoke_source_time": 13.0,
   "source_deformation": false,
   "shot_crossfade": false,

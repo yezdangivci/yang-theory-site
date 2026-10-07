@@ -1,8 +1,8 @@
-"""A separate billowing red smoke layer; source media is never remapped.
+"""Smoke-density-driven formation of a moving, undistorted Shila artwork.
 
-The original portrait keeps playing underneath the emission. The image changes
-only while optically opaque smoke hides it, then that same cloud disperses over
-the continuously moving garment composition. No object deformation.
+The smoke field controls visibility and the recovery of broad contrast, painted
+texture and fine detail independently. There is no clean incoming shot beneath
+a foreground smoke overlay. Source pixel coordinates are never displaced.
 """
 import cv2
 import numpy as np
@@ -28,6 +28,7 @@ class RedSmokeBridge:
             values = cv2.resize(values, (self.w*2, self.h*2), interpolation=cv2.INTER_CUBIC)
             self.fields.append(cv2.GaussianBlur(values, (0, 0), sigma))
         self.lobes = []
+        self.clarity = np.zeros((height, width, 1), np.float32)
         for i in range(19):
             theta = i*2.399963 + rng.uniform(-.22, .22)
             self.lobes.append((theta, rng.uniform(.35, 1), rng.uniform(.7, 1.25),
@@ -92,14 +93,44 @@ class RedSmokeBridge:
         color = cv2.resize(color, (self.width, self.height), interpolation=cv2.INTER_CUBIC)
         return np.clip(opacity, 0, 1)[..., None], color
 
+    @staticmethod
+    def soft_frame(frame, sigma, divisor):
+        height, width = frame.shape[:2]
+        small = cv2.resize(frame, (width//divisor, height//divisor), interpolation=cv2.INTER_AREA)
+        small = cv2.GaussianBlur(small, (0, 0), sigma/divisor)
+        return cv2.resize(small, (width, height), interpolation=cv2.INTER_LINEAR)
+
+    def formation(self, incoming, opacity, progress):
+        # Density itself is the spatial transition matte. Different patches
+        # resolve as their local cloud thins, never from a global shot opacity.
+        visibility = smooth(1-opacity)
+        self.clarity += (visibility-self.clarity)*.24
+        # Finish the optical recovery continuously while the camera keeps moving.
+        completion = float(smooth((progress-.70)/.16))
+        clarity = self.clarity+(1-self.clarity)*completion
+        broad_weight = visibility
+        paint_weight = visibility*clarity
+        fine_weight = visibility*clarity**3
+        low = self.soft_frame(incoming, 88, 8)
+        medium = self.soft_frame(incoming, 22, 4)
+        soft = self.soft_frame(incoming, 4, 2)
+        # Convex combinations preserve source colors. Recover local contrast
+        # and sharpness via spatial-frequency detail, with no color grading.
+        formed = low*(1-broad_weight)+medium*(broad_weight-paint_weight)
+        formed += soft*(paint_weight-fine_weight)+incoming*fine_weight
+        return formed, visibility
+
     def frame(self, progress, outgoing, incoming):
         if progress <= 0:
             return outgoing.copy()
         if progress >= 1:
             return incoming.copy()
         opacity, smoke = self.layer(progress)
-        # A single untouched image under the smoke, never two objects blended.
-        background = outgoing if progress < .38 else incoming
-        if .345 <= progress <= .405:
-            assert np.min(opacity) > .99999, 'The shot change must be completely hidden'
-        return background*(1-opacity)+smoke*opacity
+        # Ophelia loses visibility inside the cloud. Shila starts with no clean
+        # detail at all, then is constructed from the same local density field.
+        exit_strength = float(1-smooth((progress-.30)/.08))
+        outgoing_weight = (1-opacity)*exit_strength
+        if progress <= .38:
+            return outgoing*outgoing_weight+smoke*(1-outgoing_weight)
+        formed, incoming_weight = self.formation(incoming, opacity, progress)
+        return formed*incoming_weight+smoke*(1-incoming_weight)
