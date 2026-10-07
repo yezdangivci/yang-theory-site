@@ -28,9 +28,9 @@
     <p class="eyebrow">Section preview · 1920 × 1080 · 30 fps</p>
     <h1>Ophelia → Shila</h1>
     <div class="player">
-      <video id="film" controls playsinline preload="auto" poster="poster.jpg?v=continuous-smoke-1" aria-label="Ophelia red to Shila red detail, zoom out and moving clock hands">
-        <source src="preview.mp4?v=continuous-smoke-1" type="video/mp4">
-        <a href="preview.mp4?v=continuous-smoke-1">Open the section preview.</a>
+      <video id="film" controls playsinline preload="auto" poster="poster.jpg?v=density-formation-1" aria-label="Ophelia red to Shila red detail, zoom out and moving clock hands">
+        <source src="preview.mp4?v=density-formation-1" type="video/mp4">
+        <a href="preview.mp4?v=density-formation-1">Open the section preview.</a>
       </video>
       <button id="play" type="button">▶ PLAY PREVIEW</button>
     </div>
@@ -43,8 +43,8 @@
       <select id="speed" aria-label="Playback speed"><option value="1">1× normal</option><option value="0.5">0.5×</option></select>
     </div>
     <p id="phase">Ophelia · original source motion</p>
-    <p class="note">Red stone → expanding smoke with moving red garment → continuous zoom-out → moving hands.<br>The smoke transition is at <strong>1.40–2.40 seconds</strong>. “Replay red transition” starts just before it. The pendant and artwork remain unwarped. Shila’s tighter garment framing is already zooming out as it emerges: camera motion begins at 1.93 seconds, beneath the smoke. There is no restart or hold. The final clock framing and corrected moving-hands source are preserved, with no additional color correction.</p>
-    <p class="note"><a href="preview.mp4?v=continuous-smoke-1">Open the video directly</a>. The landing page and full review film are unchanged.</p>
+    <p class="note">Red stone → smoke-driven painted texture formation → continuous zoom-out → moving hands.<br>The smoke-driven formation is at <strong>1.40–2.80 seconds</strong>. “Replay red transition” starts just before it. Smoke density controls each area’s visibility, contrast and detail recovery. The tighter, higher red garment framing is already zooming out as it forms: camera motion begins at 1.93 seconds and continues throughout. The final clock framing and corrected moving-hands source are preserved, with no additional color correction.</p>
+    <p class="note"><a href="preview.mp4?v=density-formation-1">Open the video directly</a>. The landing page and full review film are unchanged.</p>
     <p id="status" role="status" aria-live="polite"></p>
   </main>
   <footer>Yang Theory — Shila handoff test. Original source files preserved.</footer>
@@ -63,7 +63,7 @@
     film.addEventListener('timeupdate',()=>{
       const t=film.currentTime;
       if(!film.ended&&t<film.duration)play.hidden=true;
-      document.querySelector('#phase').textContent=t<42/30?'Ophelia · original source motion':t<72/30?'Red stone → smoke / moving garment':t<142/30?'Shila · continuous zoom-out':'Shila · corrected source, original moving hands';
+      document.querySelector('#phase').textContent=t<42/30?'Ophelia · original source motion':t<84/30?'Smoke → painted garment texture forms':t<142/30?'Shila · continuous zoom-out':'Shila · corrected source, original moving hands';
     });
     film.addEventListener('error',()=>status.textContent='Playback could not load. Open the preview MP4 directly from the link in the player.');
   </script>
