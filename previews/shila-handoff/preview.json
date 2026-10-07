@@ -2,13 +2,25 @@
   "width": 1920,
   "height": 1080,
   "fps": 30,
-  "frames": 350,
-  "duration": 11.666666666666666,
+  "frames": 318,
+  "duration": 10.6,
   "ophelia_source_in": 11.6,
   "red_bridge_start": 1.4,
   "red_bridge_duration": 1.6,
-  "png_start": 3.0,
-  "video_handoff": 5.8,
+  "png_start": 1.9333333333333333,
+  "zoom_starts_under_smoke": true,
+  "zoom_overlap_frames": 32,
+  "smoke_clear_frame": 72,
+  "initial_native_scale": 0.9,
+  "initial_garment_native_point": [
+    1980,
+    3790
+  ],
+  "initial_garment_screen_point": [
+    947,
+    580
+  ],
+  "video_handoff": 4.733333333333333,
   "video_source_in": 0,
   "complete_shila_video": true,
   "original_files_sha256": {
@@ -29,11 +41,11 @@
     ],
     "registration_median_error_px": 0.7612966299057007
   },
-  "treatment": "Original Ophelia at 13s; separate soft ruby-red smoke obscures intact source shots; approved original-PNG zoom-out; uncorrected shila_final.mp4 from frame zero.",
+  "treatment": "Original Ophelia at 13s; soft ruby smoke and tighter garment camera move overlap continuously; same final full-clock framing and uncorrected shila_final.mp4.",
   "ophelia_smoke_source_time": 13.0,
   "source_deformation": false,
   "shot_crossfade": false,
   "shila_color_correction": false,
-  "approved_zoom_frames": 84,
+  "zoom_frames": 84,
   "full_hero_rendered": false
 }
