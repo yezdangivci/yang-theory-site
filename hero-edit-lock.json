@@ -25,5 +25,25 @@
     "zaru_to_journey_intent": "Existing emerald movement; no stone portal, beam, or additional Zaru zoom.",
     "shila_to_burton_intent": "Exact Shila-eye to Burton-eye alignment.",
     "burton_to_maker": "Original uninterrupted yez_ekran_final_web.mp4 source footage."
+  },
+  "zaru_to_journey": {
+    "status": "Active junction preview; awaiting visual review",
+    "source": "zaru5.mp4",
+    "source_in_seconds": 0,
+    "source_sha256": "125866b6919df4b2498e97d8b6b5f040232ba5ab687d7eae9944f221a8cde6ff",
+    "presentation": "Full authored 1920x1080 frame; identity scale and placement; no additional crop, framing or camera motion.",
+    "intent": "Native emerald movement carries a green atmospheric bridge into the full Journey environment. Journey runs once from source 00:00.",
+    "forbidden": [
+      "Journey inside stone",
+      "miniature Journey",
+      "portal",
+      "beam",
+      "object morphing",
+      "extra Zaru scaling or camera movement",
+      "Journey restart"
+    ],
+    "preview": "public/previews/zaru5-journey/preview.mp4",
+    "renderer": "scripts/render_zaru5_journey_preview.py",
+    "legacy_status": "The old Zaru implementation in render_review_film.py and stored master is rejected and superseded for this junction. Do not extract it for review or run a full hero render."
   }
 }

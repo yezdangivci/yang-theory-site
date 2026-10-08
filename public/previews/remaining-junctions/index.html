@@ -25,14 +25,14 @@
   <main>
     <p class="eyebrow">Current branch · Four junctions · 1920 × 1080 · 30 fps</p>
     <h1>Remaining transitions.</h1>
-    <p class="intro">Watch each junction with footage on both sides. Clips 1, 2 and 4 come from the existing rendered edit. Clip 3 keeps the current transition and starts the original Ophelia footage at <strong>00:09</strong>. The approved Ophelia → Shila transition is locked and unchanged.</p>
+    <p class="intro">Watch each junction with footage on both sides. Clip 1 is the current Zaru 5 → Journey preview. Clips 2 and 4 come from the existing rendered edit. Clip 3 keeps the current transition and starts the original Ophelia footage at <strong>00:09</strong>. The approved Ophelia → Shila transition is locked and unchanged.</p>
 
-    <article data-junction="3" id="zaru-journey">
+    <article data-junction="13.7" data-replay="11.7" id="zaru-journey">
       <p class="eyebrow">01 / 04</p><h2>Zaru → Journey</h2>
-      <p class="note notice">The stored edit still contains the earlier stone inset and brief light breakout. This is the current footage, shown as-is for review. The intended emerald-movement connection remains the requirement: no stone portal, beam or extra Zaru zoom.</p>
-      <div class="player"><video controls playsinline preload="metadata" poster="zaru-journey.jpg?v=current-junctions-1" aria-label="Current Zaru to Journey transition"><source src="zaru-journey.mp4?v=current-junctions-1" type="video/mp4"></video><button class="play" type="button">▶ PLAY CLIP</button></div>
+      <p class="note notice">Zaru 5 from 00:00, at its full authored size. Its emerald movement carries the frame into the full Journey environment. No inset, portal, beam or additional Zaru camera movement.</p>
+      <div class="player"><video controls playsinline preload="metadata" poster="../zaru5-journey/poster.jpg?v=zaru5-emerald-1" aria-label="Current Zaru to Journey transition"><source src="../zaru5-journey/preview.mp4?v=zaru5-emerald-1" type="video/mp4"></video><button class="play" type="button">▶ PLAY CLIP</button></div>
       <div class="controls"><button class="pause" disabled type="button">Pause</button><button class="replay" type="button">Replay clip</button><button class="junction" type="button">Replay transition</button><label>Speed <select aria-label="Zaru to Journey playback speed"><option value="1">1×</option><option value="0.5">0.5×</option></select></label></div>
-      <p class="context">Transition at 00:03 · 3 seconds before · 3 seconds after · <a href="zaru-journey.mp4?v=current-junctions-1">Open video directly</a></p><p class="status" role="status" aria-live="polite"></p>
+      <p class="context">Green bridge begins at 00:12.10 · full authored Zaru opening · complete Journey source · <a href="../zaru5-journey/preview.mp4?v=zaru5-emerald-1">Open video directly</a></p><p class="status" role="status" aria-live="polite"></p>
     </article>
 
     <article data-junction="4" id="journey-seek-magic">
@@ -68,7 +68,7 @@
       play.addEventListener('click',()=>start(video.ended?0:undefined));
       pause.addEventListener('click',()=>video.paused?start():video.pause());
       article.querySelector('.replay').addEventListener('click',()=>start(0));
-      article.querySelector('.junction').addEventListener('click',()=>start(Number(article.dataset.junction)-.7));
+      article.querySelector('.junction').addEventListener('click',()=>start(article.dataset.replay?Number(article.dataset.replay):Number(article.dataset.junction)-.7));
       article.querySelector('select').addEventListener('change',event=>video.playbackRate=Number(event.target.value));
       video.addEventListener('play',()=>{videos.forEach(other=>{if(other!==video&&!other.paused)other.pause();});play.hidden=true;pause.disabled=false;pause.textContent='Pause';});
       video.addEventListener('pause',()=>{pause.textContent='Resume';});

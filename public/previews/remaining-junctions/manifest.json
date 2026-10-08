@@ -8,28 +8,29 @@
   "remaining_transitions_redesigned": false,
   "approved_ophelia_shila_unchanged": true,
   "ophelia_source_in": 9,
-  "known_zaru_mismatch": "The stored master still contains the older stone inset/light breakout. It is shown unchanged; the intended emerald-movement edit remains the requirement.",
   "shila_burton_intent": "Exact Shila-eye to Burton-eye alignment.",
   "burton_maker_unchanged": true,
   "clips": [
     {
       "slug": "zaru-journey",
-      "title": "Zaru \u2192 Journey",
-      "frames": 180,
-      "duration": 6.0,
-      "junction_time": 3.0,
-      "context_before": 3.0,
-      "context_after": 3.0,
-      "stored_master_context": [
-        12.1,
-        18.1
-      ],
-      "provenance": "Existing stored master excerpt; no transition changes.",
-      "sha256": "345cfd94db03cf0b3820aa468f3f07a79b778bea36c27c9d69c5dcbb42d5fd89"
+      "title": "Zaru 5 → Journey",
+      "file": "../zaru5-journey/preview.mp4",
+      "frames": 561,
+      "duration": 18.7,
+      "junction_time": 13.7,
+      "green_motion_start": 12.1,
+      "field_clear": 15.1,
+      "provenance": "Current Zaru 5 preview. The rejected stone-inset master excerpt is superseded.",
+      "source": "zaru5.mp4",
+      "source_in": 0,
+      "additional_scale": 1,
+      "crop": false,
+      "additional_camera_motion": false,
+      "sha256": "359c839b727df4fc55d5632aeb2d738f6d782720ee76d13cc570692a65e38335"
     },
     {
       "slug": "journey-seek-magic",
-      "title": "Journey \u2192 Seek Magic",
+      "title": "Journey → Seek Magic",
       "frames": 210,
       "duration": 7.0,
       "junction_time": 4.0,
@@ -44,7 +45,7 @@
     },
     {
       "slug": "seek-magic-ophelia",
-      "title": "Seek Magic \u2192 Ophelia",
+      "title": "Seek Magic → Ophelia",
       "frames": 195,
       "duration": 6.5,
       "junction_time": 3.0,
@@ -64,7 +65,7 @@
     },
     {
       "slug": "shila-burton",
-      "title": "Shila \u2192 Burton",
+      "title": "Shila → Burton",
       "frames": 210,
       "duration": 7.0,
       "junction_time": 3.0,
@@ -77,5 +78,6 @@
       "provenance": "Existing stored master excerpt; no transition changes.",
       "sha256": "5d907c99a92554ee26c4e396cfeaa3c0be52a39584f1cff686eae87826a56242"
     }
-  ]
+  ],
+  "zaru_preview_updated": true
 }
