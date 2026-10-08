@@ -82,7 +82,7 @@ class Handoff:
     def homogeneous(matrix):
         return np.vstack([matrix, [0, 0, 1]])
 
-    def png_frame(self, index):
+    def png_frame(self, index, return_alpha=False):
         matrix, scale, t = self.png_matrix(index)
         rgba = cv2.warpAffine(self.png, matrix, (W, H), flags=cv2.INTER_LANCZOS4,
                               borderValue=tuple(int(v) for v in (*IVORY, 0)))
@@ -92,7 +92,8 @@ class Handoff:
         if strength > 0:
             # Preserve the approved softness envelope only. Original PNG colors.
             rgb = cv2.GaussianBlur(rgb, (0, 0), max(.01, self.sigma*strength*scale/.26562))
-        return IVORY*(1-alpha)+rgb*alpha
+        frame = IVORY*(1-alpha)+rgb*alpha
+        return (frame, alpha) if return_alpha else frame
 
     def png_matrix(self, index):
         t = index/(ZOOM_FRAMES-1)
@@ -179,11 +180,11 @@ def main():
         for i in range(BRIDGE_FRAMES):
             # The single camera advances every frame under the same cloud.
             # Continue the same indices after the cloud; never restart at zero.
-            moving_shila = match.png_frame(max(0, i-ZOOM_START))
+            moving_shila, artwork_alpha = match.png_frame(max(0, i-ZOOM_START), return_alpha=True)
             progress = i/(BRIDGE_FRAMES-1)
             outgoing = ophelia(tail[min(OPHELIA_FRAMES+i, len(tail)-1)]) if bridge.event_progress(progress) <= .148 else moving_shila
-            material = bridge.frame(progress, outgoing, moving_shila)
-            if i in [6, 18, 25, 33, 42, 57, 72, 81, 96, 111, 129, 144]:
+            material = bridge.frame(progress, outgoing, moving_shila, artwork_alpha)
+            if i in [6, 18, 25, 33, 42, 57, 72, 81, 96, 108, 111, 123, 129, 135, 138, 144]:
                 Image.fromarray(material.astype('uint8')).save(args.qa/f'red-smoke-{i}.png')
             write(material)
         for i in range(ZOOM_OVERLAP, ZOOM_FRAMES):
@@ -199,7 +200,9 @@ def main():
         'ophelia_source_in': OPHELIA_IN, 'red_bridge_start': OPHELIA_FRAMES/FPS,
         'red_bridge_duration': BRIDGE_FRAMES/FPS, 'png_start': (OPHELIA_FRAMES+ZOOM_START)/FPS,
         'zoom_starts_under_smoke': True, 'zoom_overlap_frames': ZOOM_OVERLAP,
-        'smoke_clear_frame': OPHELIA_FRAMES+int(np.ceil(4.56*FPS)),
+        'smoke_clear_frame': 6*FPS,
+        'peripheral_smoke_visible_at': 5.0,
+        'artwork_smoke_clear_at': 4.7,
         'formation_complete_frame': OPHELIA_FRAMES+int(np.ceil(4.60*FPS)),
         'field_timing_seconds': bridge.EVENT_SECONDS.tolist(),
         'field_timing_phases': bridge.EVENT_PHASES.tolist(),
@@ -208,7 +211,7 @@ def main():
         'initial_garment_screen_point': [947, 565],
         'video_handoff': HANDOFF_FRAME/FPS, 'video_source_in': 0, 'complete_shila_video': True,
         'original_files_sha256': hashes, 'handoff_metrics': metrics,
-        'treatment': 'Original Ophelia at 13s; retimed integrated field gives the red-source bloom and smoke-to-garment formation 2.7 seconds of reading time; tighter, slightly higher dress crop moves continuously through locally resolving density and detail; same final clock framing and uncorrected shila_final.mp4.',
+        'treatment': 'Same 2.7-second red-stone / smoke-to-garment transformation and continuous camera move; the original field retreats off the artwork into dispersing wisps on the surrounding ivory, readable at 5 seconds and fully gone at 6 seconds; unchanged centered clock framing and uncorrected shila_final.mp4.',
         'smoke_controls_reveal': ['opacity', 'local_contrast', 'sharpness'],
         'clean_shila_under_smoke': False,
         'ophelia_smoke_source_time': OPHELIA_IN+OPHELIA_FRAMES/FPS,

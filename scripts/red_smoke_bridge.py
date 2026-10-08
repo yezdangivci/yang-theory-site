@@ -57,7 +57,7 @@ class RedSmokeBridge:
         return float((2*t**3-3*t*t+1)*a+(t**3-2*t*t+t)*duration*da
                      +(-2*t**3+3*t*t)*b+(t**3-t*t)*duration*db)
 
-    def layer(self, progress):
+    def layer(self, progress, artwork_alpha=None):
         p = self.event_progress(progress)
         # The original short emission opens into a field that keeps evolving
         # throughout the camera move, rather than extinguishing before it.
@@ -113,10 +113,27 @@ class RedSmokeBridge:
         # Texture/light stays continuous through that opaque part of the cloud.
         occlusion = float(smooth((p-.116)/.0175)*(1-smooth((p-.157)/.025)))
         opacity += occlusion*(1-opacity)
+        lingering_density = opacity.copy()
         if p > .62:
             # Dissipation starts in the emission/red-garment zone, with organic
             # density variations; the cloud's fringes drift away last.
             opacity *= float(smooth((.95-p)/.33))
+        if artwork_alpha is not None:
+            # The same dispersing field retreats onto the revealed ivory,
+            # while the artwork resolves cleanly. Preserve the early handoff.
+            seconds = float(progress)*self.EVENT_SECONDS[-1]
+            retreat = float(smooth((seconds-2.70)/.60))
+            silhouette = cv2.resize(artwork_alpha[..., 0], (self.w, self.h),
+                                    interpolation=cv2.INTER_AREA)
+            peripheral_falloff = float(1-smooth((seconds-3.65)/.95))
+            # Keep the existing advected curls readable as separated wisps,
+            # rather than a uniform pink tint on the ivory surround.
+            filaments = smooth((noise-.39)/.22)
+            wisps = (1-np.exp(-lingering_density*3.0))*filaments*peripheral_falloff
+            opacity = opacity*(1-retreat)+wisps*retreat*(1-silhouette)
+            # Absolute preview deadline: 1.4s source lead + 4.6s field = 6s.
+            if seconds >= 4.60:
+                opacity.fill(0)
         # Backlit volume shading, sampled from a restrained ruby-red palette.
         # Added atmosphere is independent; source colors are not graded.
         shade = np.clip((noise-.24)*1.9, 0, 1)
@@ -157,12 +174,12 @@ class RedSmokeBridge:
         formed += soft*(paint_weight-fine_weight)+incoming*fine_weight
         return formed, visibility, low
 
-    def frame(self, progress, outgoing, incoming):
+    def frame(self, progress, outgoing, incoming, artwork_alpha=None):
         if progress <= 0:
             return outgoing.copy()
         if progress >= 1:
             return incoming.copy()
-        opacity, smoke = self.layer(progress)
+        opacity, smoke = self.layer(progress, artwork_alpha)
         event = self.event_progress(progress)
         # Ophelia loses visibility inside the cloud. Shila starts with no clean
         # detail at all, then is constructed from the same local density field.
