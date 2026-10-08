@@ -15,43 +15,47 @@
       "slug": "zaru-journey",
       "title": "Zaru 5 → Journey",
       "file": "../zaru5-journey/preview.mp4",
-      "frames": 567,
-      "duration": 18.9,
-      "junction_time": 15.7,
+      "frames": 582,
+      "duration": 19.4,
+      "junction_time": 15.8,
       "green_motion_start": 13.0,
-      "provenance": "Green concentration → green orb release → 2s depth passage with green-to-blue shift and progressive live Journey resolution → moving plant contact.",
+      "provenance": "Green glow → green orb approaches camera while Zaru pulls back into black → continuous black lens passage → green-to-blue curved recession into live Journey → moving plant contact.",
       "source": "zaru5.mp4",
       "source_in": 0,
       "additional_scale": 1.4,
       "crop": false,
-      "additional_camera_motion": false,
-      "sha256": "1bf856b9a03e2183bd593527dbb50f631430122570a7bc7cb48f61d3ffc0bae4",
-      "scale_animated": false,
-      "match_clear": 16.0,
+      "additional_camera_motion": "Exit-only pullback",
+      "sha256": "f81480e942bbc659a7d4c1b8940c7f0879ca42064df47ec1a6927192b8bec0b3",
+      "scale_animated": "Exit-only 8% pullback, explicitly requested; never an added push-in.",
+      "match_clear": 16.1,
       "match_anchor": [
-        995.3635009765625,
-        618.5759399414062
+        995.4698852539062,
+        618.22841796875
       ],
       "journey_initial_offset": [
         0,
         0
       ],
       "orb_formation_start": 13.0,
-      "orb_formation_end": 13.7,
-      "orb_travel_start": 13.7,
-      "orb_arrival": 15.7,
+      "orb_formation_end": 13.5,
+      "orb_travel_start": 13.5,
+      "orb_arrival": 15.8,
       "orb_core_diameter": 8.743416490252569,
       "native_plant_point": [
         651.0,
         625.0
       ],
       "plant_arrival_point": [
-        652.0947265625,
-        639.85498046875
+        649.4803466796875,
+        625.5048217773438
       ],
-      "journey_start": 13.9,
-      "journey_resolution_clear": 15.4,
-      "transformation_duration": 2.7
+      "journey_start": 14.4,
+      "journey_resolution_clear": 15.5,
+      "transformation_duration": 2.8,
+      "near_camera": 14.1,
+      "black_passage_start": 14.1,
+      "black_passage_frames": 9,
+      "zaru_exit_pullback": 0.08
     },
     {
       "slug": "journey-seek-magic",
