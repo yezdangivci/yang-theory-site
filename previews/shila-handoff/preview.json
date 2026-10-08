@@ -10,7 +10,9 @@
   "png_start": 2.4,
   "zoom_starts_under_smoke": true,
   "zoom_overlap_frames": 115,
-  "smoke_clear_frame": 179,
+  "smoke_clear_frame": 180,
+  "peripheral_smoke_visible_at": 5.0,
+  "artwork_smoke_clear_at": 4.7,
   "formation_complete_frame": 180,
   "field_timing_seconds": [
     0.0,
@@ -71,7 +73,7 @@
     ],
     "registration_median_error_px": 0.7612966299057007
   },
-  "treatment": "Original Ophelia at 13s; retimed integrated field gives the red-source bloom and smoke-to-garment formation 2.7 seconds of reading time; tighter, slightly higher dress crop moves continuously through locally resolving density and detail; same final clock framing and uncorrected shila_final.mp4.",
+  "treatment": "Same 2.7-second red-stone / smoke-to-garment transformation and continuous camera move; the original field retreats off the artwork into dispersing wisps on the surrounding ivory, readable at 5 seconds and fully gone at 6 seconds; unchanged centered clock framing and uncorrected shila_final.mp4.",
   "smoke_controls_reveal": [
     "opacity",
     "local_contrast",
