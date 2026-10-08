@@ -22,7 +22,7 @@
   },
   "remaining_junctions": {
     "review_only": true,
-    "zaru_to_journey_intent": "SCREEN-SPACE MATCH: active native emerald area aligns with an existing Journey plant light. No travelling effect, beam, streak, fog, wash, inset, portal or object morphing.",
+    "zaru_to_journey_intent": "Emerald energy concentrates inside the stone → tiny blue/lilac orb, matching native firefly scale and plant glow → short elegant travel → real plant glow-point contact triggers the full Journey environment. No beam, streak, large flare, smoke, portal, inset scene or object deformation.",
     "shila_to_burton_intent": "Exact Shila-eye to Burton-eye alignment.",
     "burton_to_maker": "Original uninterrupted yez_ekran_final_web.mp4 source footage."
   },
@@ -32,14 +32,12 @@
     "source_in_seconds": 0,
     "source_sha256": "125866b6919df4b2498e97d8b6b5f040232ba5ab687d7eae9944f221a8cde6ff",
     "presentation": "Whole Zaru 5 source at a constant 1.35 display size, centered; substantial black negative space and original internal motion preserved. No added animated zoom.",
-    "intent": "Existing active emerald light → same-position existing plant light → native luminance/detail resolution of the full Journey environment. Journey may be slightly reframed for alignment, then returns to native framing.",
+    "intent": "Emerald energy concentrates inside the stone → tiny blue/lilac orb, matching native firefly scale and plant glow → short elegant travel → real plant glow-point contact triggers the full Journey environment. No beam, streak, large flare, smoke, portal, inset scene or object deformation.",
     "forbidden": [
       "beam",
       "ray",
       "streak",
-      "projectile",
       "comet",
-      "travelling light",
       "Journey inside stone",
       "miniature Journey",
       "portal",
@@ -49,13 +47,18 @@
       "object morphing",
       "generic full-frame crossfade",
       "extra animated Zaru zoom",
-      "Journey restart"
+      "Journey restart",
+      "laser",
+      "long travelling streak",
+      "large orb",
+      "full-screen flash"
     ],
     "preview": "public/previews/zaru5-journey/preview.mp4",
     "renderer": "scripts/render_zaru5_journey_preview.py",
-    "legacy_status": "The stored stone inset, zaru5-emerald-1 fog preview and zaru5-light-2 travelling beam preview are rejected. This screen-space plant-light match supersedes them. Do not render the full hero.",
+    "legacy_status": "Stone insets, green fog and the travelling-beam preview remain rejected. The prior no-travel screen-space match is superseded by the latest expressly requested tiny blue/lilac orb transfer. Do not render the full hero.",
     "display_scale": 1.35,
     "display_scale_animated": false,
-    "review_version": "zaru5-point-match-3"
+    "review_version": "zaru5-tiny-orb-4",
+    "allowed_energy_transfer": "The latest explicit request allows a tiny blue/lilac travelling orb only. This supersedes the earlier blanket prohibition on travelling light; beams and streaks remain forbidden."
   }
 }

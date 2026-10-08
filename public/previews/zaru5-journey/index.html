@@ -28,23 +28,23 @@
     <p class="eyebrow">Section preview · 1920 × 1080 · 30 fps</p>
     <h1>Zaru 5 → Journey</h1>
     <div class="player">
-      <video id="film" controls playsinline preload="auto" poster="poster.jpg?v=zaru5-point-match-3" aria-label="Zaru 5 from its black opening, emerald movement into the full Journey environment">
-        <source src="preview.mp4?v=zaru5-point-match-3" type="video/mp4">
-        <a href="preview.mp4?v=zaru5-point-match-3">Open the section preview.</a>
+      <video id="film" controls playsinline preload="auto" poster="poster.jpg?v=zaru5-tiny-orb-4" aria-label="Zaru 5 from its black opening, emerald movement into the full Journey environment">
+        <source src="preview.mp4?v=zaru5-tiny-orb-4" type="video/mp4">
+        <a href="preview.mp4?v=zaru5-tiny-orb-4">Open the section preview.</a>
       </video>
       <button id="play" type="button">▶ PLAY PREVIEW</button>
     </div>
     <div class="controls">
       <button id="pause" type="button" disabled>Pause</button>
       <button id="replay" type="button">Replay section</button>
-      <button id="handoff" type="button">Replay green transition</button>
+      <button id="handoff" type="button">Replay orb transition</button>
       <button id="journey" type="button">Replay Journey</button>
       <label class="eyebrow" for="speed">Speed</label>
       <select id="speed" aria-label="Playback speed"><option value="1">1× normal</option><option value="0.5">0.5×</option></select>
     </div>
     <p id="phase">Zaru 5 · original source motion</p>
-    <p class="note">Zaru 5 starts at <strong>00:00</strong>, displayed at a <strong>fixed 1.35× size throughout</strong>, with its original motion and substantial black breathing room.<br>Moving emerald → matched luminous plant point → full Journey environment. The existing points share the same screen position at the handoff. “Replay green transition” starts at 12.60 seconds. Journey runs once from its beginning.</p>
-    <p class="note"><a href="preview.mp4?v=zaru5-point-match-3">Open the video directly</a>.</p>
+    <p class="note">Zaru 5 starts at <strong>00:00</strong>, displayed at a <strong>fixed 1.35× size throughout</strong>, with its original motion and substantial black breathing room.<br>Emerald energy → tiny blue-lilac orb → short travel → plant contact → full Journey. The orb matches the scale of Journey’s little firefly lights, with no beam or trail. “Replay orb transition” starts at 12.60 seconds. Journey runs once from its beginning.</p>
+    <p class="note"><a href="preview.mp4?v=zaru5-tiny-orb-4">Open the video directly</a>.</p>
     <p id="status" role="status" aria-live="polite"></p>
   </main>
   <footer>Yang Theory — Zaru 5 / Journey preview. Original source files preserved.</footer>
@@ -63,7 +63,7 @@
     film.addEventListener('timeupdate',()=>{
       const t=film.currentTime;
       if(!film.ended&&t<film.duration)play.hidden=true;
-      document.querySelector('#phase').textContent=t<13?'Zaru 5 · original source motion':t<14.1?'Emerald · existing active light':t<15.6?'Matched plant light · environment resolving':'Journey · continuous original source motion';
+      document.querySelector('#phase').textContent=t<13?'Zaru 5 · original source motion':t<13.57?'Emerald · tiny orb forming':t<14.1?'Blue-lilac orb · short travel':t<15.6?'Plant contact · environment resolving':'Journey · continuous original source motion';
     });
     film.addEventListener('error',()=>status.textContent='Playback could not load. Open the preview MP4 directly from the link in the player.');
   </script>

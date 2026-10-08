@@ -19,13 +19,13 @@
       "duration": 19.1,
       "junction_time": 14.1,
       "green_motion_start": 13.0,
-      "provenance": "Current screen-space match of real emerald and plant light. No travelling light; native luminance and detail resolve the environment.",
+      "provenance": "Emerald energy concentrates → tiny blue/lilac orb → short clean travel → plant contact → native luminance/detail resolution of Journey.",
       "source": "zaru5.mp4",
       "source_in": 0,
       "additional_scale": 1.35,
       "crop": false,
       "additional_camera_motion": false,
-      "sha256": "cb04dcc6b72dda12d23cebc460e4d0ee38103cae68baa0a2e6a07f1d09ed4e80",
+      "sha256": "49660e51fe20e0396d70b662e4179a11282319b85648d25a114931124cb4ceda",
       "scale_animated": false,
       "match_clear": 15.6,
       "match_anchor": [
@@ -33,8 +33,17 @@
         615.880728149414
       ],
       "journey_initial_offset": [
-        83.00394897460933,
-        -25.11927185058596
+        0,
+        0
+      ],
+      "orb_formation_start": 13.0,
+      "orb_formation_end": 13.433333333333334,
+      "orb_travel_start": 13.566666666666666,
+      "orb_arrival": 14.066666666666666,
+      "orb_core_diameter": 8.743416490252569,
+      "native_plant_point": [
+        912.0,
+        641.0
       ]
     },
     {

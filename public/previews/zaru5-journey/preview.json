@@ -27,21 +27,34 @@
     0
   ],
   "journey_clock": "Single forward pass, no restart or duplicate sequence.",
-  "bridge": "Moving emerald \u2192 coincident native plant light \u2192 luminance/detail resolution of the full Journey environment.",
+  "bridge": "Emerald energy concentrates \u2192 tiny blue/lilac orb \u2192 short clean travel \u2192 plant contact \u2192 native luminance/detail resolution of Journey.",
   "match_anchor": [
     994.0039489746093,
     615.880728149414
   ],
   "native_plant_point": [
-    911.0,
+    912.0,
     641.0
   ],
+  "orb_formation_start": 13.0,
+  "orb_formation_end": 13.433333333333334,
+  "orb_travel_start": 13.566666666666666,
+  "orb_arrival": 14.066666666666666,
+  "orb_core_diameter": 8.743416490252569,
+  "orb_lilac_fringe_rgb": [
+    76.64700317382812,
+    89.91300201416016,
+    255.0
+  ],
+  "orb_travel_distance_pixels": 85.7649431045924,
+  "orb_tail": false,
+  "orb_flash": false,
   "journey_initial_offset": [
-    83.00394897460933,
-    -25.11927185058596
+    0,
+    0
   ],
   "journey_additional_scale": 1,
-  "journey_recenter_frames": 45,
+  "journey_recenter_frames": 0,
   "source_sha256": {
     "zaru5.mp4": "125866b6919df4b2498e97d8b6b5f040232ba5ab687d7eae9944f221a8cde6ff",
     "Journey:Yez Startle video.mp4": "af3194e2f340a0e71b5a994a48565c5a1f609fd27c503a8bd7a7d94d065d68c7"
@@ -50,7 +63,7 @@
   "miniature_journey": false,
   "beam": false,
   "streak": false,
-  "travelling_light": false,
+  "travelling_light": "Tiny blue/lilac orb only, explicitly requested.",
   "flat_color_wash": false,
   "smoke": false,
   "fog": false,
