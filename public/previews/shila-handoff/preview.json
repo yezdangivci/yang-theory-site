@@ -2,32 +2,88 @@
   "width": 1920,
   "height": 1080,
   "fps": 30,
-  "frames": 355,
-  "duration": 11.833333333333334,
+  "frames": 363,
+  "duration": 12.1,
   "ophelia_source_in": 11.6,
-  "png_start": 3.1666666666666665,
-  "technical_match_start": 4.992666666666667,
-  "video_handoff": 5.966666666666667,
+  "red_bridge_start": 1.4,
+  "red_bridge_duration": 4.833333333333333,
+  "png_start": 2.4,
+  "zoom_starts_under_smoke": true,
+  "zoom_overlap_frames": 115,
+  "smoke_clear_frame": 180,
+  "peripheral_smoke_visible_at": 5.0,
+  "artwork_smoke_clear_at": 4.7,
+  "formation_complete_frame": 180,
+  "field_timing_seconds": [
+    0.0,
+    0.36,
+    0.85,
+    1.1,
+    1.28,
+    1.65,
+    2.1,
+    2.7,
+    3.25,
+    3.95,
+    4.56,
+    4.8
+  ],
+  "field_timing_phases": [
+    0.0,
+    0.055,
+    0.116,
+    0.148,
+    0.23,
+    0.26,
+    0.285,
+    0.32,
+    0.41,
+    0.62,
+    0.95,
+    1.0
+  ],
+  "readable_transformation_seconds": 2.7,
+  "initial_native_scale": 1.0,
+  "initial_garment_native_point": [
+    1800,
+    3750
+  ],
+  "initial_garment_screen_point": [
+    947,
+    565
+  ],
+  "video_handoff": 6.233333333333333,
   "video_source_in": 0,
   "complete_shila_video": true,
   "original_files_sha256": {
     "shila_original.png": "54531cb4b0b3edfe01e888368f359a639adedcdedb29f3690a719cf982ed40d5",
-    "shila_lastvideo.mp4": "a7125db3a74169073cc40b7dacf5c6770fb518459ba26eb101eb746441e12b11",
+    "shila_final.mp4": "790f8e1c281ead69142981bd5d26fb39314bb27d9302a598397956a666110f3d",
     "ophelia_landing_916_web.mp4": "5d55dc00d8a49c52c28b1987bb31723cbb344b9870dc4d9fd886bc53868e0c8f"
   },
   "handoff_metrics": {
     "mean_rgb_absolute_error": [
-      7.399472236633301,
-      5.679378509521484,
-      8.916836738586426
+      11.419410705566406,
+      7.958704948425293,
+      12.770926475524902
     ],
     "median_rgb_absolute_error": [
-      5.031257629394531,
-      4.1573486328125,
-      5.462493896484375
+      8.378665924072266,
+      5.987261772155762,
+      9.385858535766602
     ],
     "registration_median_error_px": 0.7612966299057007
   },
-  "treatment": "Same PNG: reference-calibrated RGB tone/color coefficients, smooth local illumination compensation, optical softness; then a direct frame-zero video switch.",
+  "treatment": "Same 2.7-second red-stone / smoke-to-garment transformation and continuous camera move; the original field retreats off the artwork into dispersing wisps on the surrounding ivory, readable at 5 seconds and fully gone at 6 seconds; unchanged centered clock framing and uncorrected shila_final.mp4.",
+  "smoke_controls_reveal": [
+    "opacity",
+    "local_contrast",
+    "sharpness"
+  ],
+  "clean_shila_under_smoke": false,
+  "ophelia_smoke_source_time": 13.0,
+  "source_deformation": false,
+  "shot_crossfade": false,
+  "shila_color_correction": false,
+  "zoom_frames": 115,
   "full_hero_rendered": false
 }

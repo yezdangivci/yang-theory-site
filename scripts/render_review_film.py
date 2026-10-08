@@ -18,9 +18,12 @@ from scipy.spatial import ConvexHull
 
 ROOT = Path(__file__).resolve().parents[1]
 W, H, FPS = 1920, 1080, 30
+EDIT_LOCK = json.loads((ROOT/'hero-edit-lock.json').read_text())
+OPHELIA_SOURCE_IN = EDIT_LOCK['ophelia']['source_in_seconds']
+OPHELIA_SOURCE_FIRST_FRAME = round(OPHELIA_SOURCE_IN*FPS)
 SOURCES = ['zaru_3_web.mp4', 'Journey:Yez Startle video.mp4', 'seek_magic_table.png',
            'ophelia_landing_916_web.mp4', 'shila_lastvideo.mp4', 'yez_ekran_final_web.mp4']
-COUNTS = [453, 152, 135, 443, 176, 214]
+COUNTS = [453, 152, 135, 443-OPHELIA_SOURCE_FIRST_FRAME, 176, 214]
 STARTS = np.cumsum([0] + COUNTS[:-1]).tolist()
 TOTAL = sum(COUNTS)
 Y, X = np.mgrid[:H, :W].astype(np.float32)
@@ -225,7 +228,7 @@ class MasterEdit:
                     frame = optical(frame,(960,695),[1.35,.48][remaining],[.87,.93,1],radius=75,streak=1100)
             return frame
         if scene == 3:
-            frame = self.ophelia(self.clips[3].get(index))
+            frame = self.ophelia(self.clips[3].get(index+OPHELIA_SOURCE_FIRST_FRAME))
             if index < 5:
                 frame = optical(frame,(960,695),[1.9,.85,.38,.14,.04][index],[.87,.93,1],radius=95,streak=1300)
             return frame  # hard wearable-object → painted-object cut follows
@@ -272,7 +275,7 @@ def main():
         'starts':{name:STARTS[i]/FPS for i,name in enumerate(['Zaru','Journey','Seek Magic','Ophelia','Shila','Burton'])},
         'chapters':[{'index':i,'name':name,'start':STARTS[i]/FPS,'end':(STARTS[i]+COUNTS[i])/FPS} for i,name in enumerate(['Zaru','Journey','Seek Magic','Ophelia','Shila','Burton'])],
         'source_sha256':{name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in SOURCES},
-        'complete_source_ranges':{name:[0, float(json.loads(subprocess.check_output(['ffprobe','-v','error','-show_format','-of','json',str(ROOT/name)]))['format']['duration'])] for name in SOURCES if name.endswith('.mp4')},
+        'complete_source_ranges':{name:[OPHELIA_SOURCE_IN if name==SOURCES[3] else 0, float(json.loads(subprocess.check_output(['ffprobe','-v','error','-show_format','-of','json',str(ROOT/name)]))['format']['duration'])] for name in SOURCES if name.endswith('.mp4')},
         'events':['resin portal → local breakout → cut','plant reaction → short optical peak → orb cut','orb specular event → cut → jewelry glint','pendant → painted object hard cut','painted eye → aligned living eye hard cut'],
         'table':{'native_alpha_bounds':edit.alpha_bounds,'visible_center':[960,540],'fixed_height':780,'temporal_alpha_change':False},
         'gaze_match':{'eye':edit.burton_eye.tolist(),'maximum_clock_height_fraction':.817,'restrained_scale_ratio':.864/.831},
