@@ -22,7 +22,7 @@
   },
   "remaining_junctions": {
     "review_only": true,
-    "zaru_to_journey_intent": "Existing emerald movement; no stone portal, beam, or additional Zaru zoom.",
+    "zaru_to_journey_intent": "Native emerald activity connects to Journey’s luminous plant/environment. A restrained local light trace is allowed; no stone inset, portal, fog, morphing or additional animated Zaru zoom.",
     "shila_to_burton_intent": "Exact Shila-eye to Burton-eye alignment.",
     "burton_to_maker": "Original uninterrupted yez_ekran_final_web.mp4 source footage."
   },
@@ -31,19 +31,22 @@
     "source": "zaru5.mp4",
     "source_in_seconds": 0,
     "source_sha256": "125866b6919df4b2498e97d8b6b5f040232ba5ab687d7eae9944f221a8cde6ff",
-    "presentation": "Full authored 1920x1080 frame; identity scale and placement; no additional crop, framing or camera motion.",
-    "intent": "Native emerald movement carries a green atmospheric bridge into the full Journey environment. Journey runs once from source 00:00.",
+    "presentation": "Whole Zaru 5 source at a constant 1.20 display scale, centered; black breathing room and original internal motion preserved. No additional animated camera transform.",
+    "intent": "Native emerald movement → short light trace toward Journey’s plant → brief optical bloom → full-frame Journey. Journey runs once from source 00:00.",
     "forbidden": [
       "Journey inside stone",
       "miniature Journey",
       "portal",
-      "beam",
+      "full-screen fog/smoke interlude",
       "object morphing",
-      "extra Zaru scaling or camera movement",
+      "extra animated Zaru zoom or camera movement",
       "Journey restart"
     ],
     "preview": "public/previews/zaru5-journey/preview.mp4",
     "renderer": "scripts/render_zaru5_journey_preview.py",
-    "legacy_status": "The old Zaru implementation in render_review_film.py and stored master is rejected and superseded for this junction. Do not extract it for review or run a full hero render."
+    "legacy_status": "The stored full-master stone inset and the previous zaru5-emerald-1 fog preview are rejected. This local-light preview supersedes them. Do not render the full hero.",
+    "display_scale": 1.2,
+    "display_scale_animated": false,
+    "review_version": "zaru5-light-2"
   }
 }

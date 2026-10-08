@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Zaru 5, authored full frame → native-green movement → full Journey.
+"""Render only Zaru 5 → emerald light → full Journey.
 
-This renders this junction only. Zaru pixels are never scaled, cropped,
-repositioned, displaced or replaced by forest pixels. The emerald's measured
-motion drives a separate atmospheric field. That field conceals the scene
-handoff; Journey then plays once, at full-frame native size, through its dispersal.
+Zaru starts at 00:00 with a constant 1.20 display scale. No animated camera
+transform is added. Native emerald movement drives a short light trace into
+the plant position; a brief lens bloom conceals the edit. Journey is always
+full-frame, never inset into the pendant, and advances once from 00:00.
+Neither source object is warped; the original source files remain unchanged.
 """
 import argparse
 import hashlib
@@ -21,8 +22,9 @@ W, H, FPS = 1920, 1080, 30
 SOURCE = ROOT/'zaru5.mp4'
 JOURNEY = ROOT/'Journey:Yez Startle video.mp4'
 OUT = ROOT/'public/previews/zaru5-journey'
-GREEN_START_FRAME = 363  # 12.10s; source framing/motion remains untouched.
-FIELD_EXIT_FRAMES = 42  # 1.4s of continuing Journey motion through dispersal.
+DISPLAY_SCALE = 1.20  # Constant for every Zaru frame; not an animated zoom.
+GREEN_START_FRAME = 372  # 12.40s; native emerald action motivates the light.
+LIGHT_EXIT_FRAMES = 19  # A short optical recovery, not a smoke interlude.
 cv2.setNumThreads(2)
 
 
@@ -92,102 +94,99 @@ def analyse_emerald():
     return records
 
 
-class EmeraldMovement:
+def display_zaru(frame):
+    """Enlarge the complete source uniformly; only outer black margins exit canvas."""
+    larger = cv2.resize(frame, (2304, 1296), interpolation=cv2.INTER_LANCZOS4)
+    return larger[108:1188, 192:2112]
+
+
+class EmeraldLight:
     def __init__(self, measured, journey_start):
         self.measured = measured
         self.journey_start = journey_start
-        self.size = (W//4, H//4)
+        self.size = (W//2, H//2)
         self.y, self.x = np.mgrid[:self.size[1], :self.size[0]].astype(np.float32)
-        self.clarity = np.zeros((H, W, 1), np.float32)
-        rng = np.random.default_rng(5005)
-        self.textures = []
-        for size in [9, 21, 43]:
-            texture = cv2.resize(rng.random((size, size*2), dtype=np.float32),
-                                (self.size[0]*2, self.size[1]*2), interpolation=cv2.INTER_CUBIC)
-            self.textures.append(cv2.GaussianBlur(texture, (0, 0), 1.5))
-        self.curls = [(i*2.399963, rng.uniform(.25, 1), rng.uniform(.62, 1.15),
-                       rng.uniform(.7, 1.1)) for i in range(23)]
-        motion = measured[:, 5:7]
-        # Carry the small native material velocities into the larger volume;
-        # this gain applies to atmosphere only, never the pendant or camera.
-        self.drift = np.cumsum(motion*12, axis=0)
-        self.turn = np.cumsum(measured[:, 8]*18)
-        self.energy = np.cumsum(measured[:, 7]*.12)
+        self.target = np.array([650., 625.], np.float32)
+        self.last_origin = (measured[-1, :2]-[W/2, H/2])*DISPLAY_SCALE+[W/2, H/2]
+        self.last_color = measured[-1, 2:5]
 
-    def field(self, frame_index):
-        emission_length = self.journey_start-GREEN_START_FRAME
-        t = (frame_index-GREEN_START_FRAME)/emission_length
-        phase = max(0, frame_index-GREEN_START_FRAME)/FPS
-        native_index = min(frame_index, len(self.measured)-1)
+    def light(self, index):
+        time = index/FPS
+        native_index = min(index, len(self.measured)-1)
         sample = self.measured[native_index]
-        ox, oy = sample[:2]/4
-        dx, dy = self.drift[native_index]-self.drift[GREEN_START_FRAME]
-        turn = float(self.turn[native_index]-self.turn[GREEN_START_FRAME])
-        energy = float(self.energy[native_index]-self.energy[GREEN_START_FRAME])
-        # Source-derived movement advects the atmosphere only. It never remaps
-        # either media frame and never draws a Journey image inside the stone.
-        nx = self.x+phase*12+dx+9*np.sin(self.y/40+phase*.7+turn)
-        ny = self.y+phase*21+dy+7*np.sin(self.x/55-phase*.8)
-        texture = np.zeros_like(self.x)
-        for i, values in enumerate(self.textures):
-            texture += cv2.remap(values, nx*(1+i*.03), ny*(1+i*.03),
-                                cv2.INTER_CUBIC, borderMode=cv2.BORDER_REFLECT_101)/(2**i)
-        texture /= 1.75
-        growth = float(smooth((t-.05)/.76))
-        radius = 15+390*growth**1.5
-        qx = self.x+18*(texture-.5)*growth+8*np.sin(self.y/34+phase+turn)*growth
-        qy = self.y+8*np.sin(self.x/37-phase*.8)*growth
-        density = np.zeros_like(self.x)
-        for theta, travel, size, strength in self.curls:
-            angle = theta+turn+phase*.11
-            cx = ox+np.cos(angle)*radius*travel*.43+dx*.12
-            cy = oy+np.sin(angle)*radius*travel*.40-phase*12+dy*.12
-            sx = max(3, radius*size*.46)
-            sy = sx*(.76+.12*np.sin(theta+phase*.6))
-            density += np.exp(-.5*((qx-cx)/sx)**2-.5*((qy-cy)/sy)**2)*strength
-        density *= (.3+texture*1.2)*float(smooth(t/.15))*(.8+min(.2, energy*.012))
-        opacity = 1-np.exp(-density*.85)
-        # Cover the whole outgoing shot before the environment clock begins.
-        # This is moving green volume, with no flare, beam or portal aperture.
-        coverage = float(smooth((t-.87)/.10))
-        opacity += coverage*(1-opacity)
-        if frame_index >= self.journey_start:
-            u = (frame_index-self.journey_start)/FIELD_EXIT_FRAMES
-            # Curls thin at different rates; the left forest structure becomes
-            # readable first while the environment plays forward continuously.
-            local = .74+texture*.38 + .12*np.sin(self.x/80+self.y/93+phase*.4)
-            erosion = smooth((u-.035*texture)/np.maximum(.3, local))
-            opacity *= 1-erosion
-            opacity *= float(1-smooth((u-.76)/.24))
-        shade = np.clip((texture-.23)*1.75, 0, 1)
-        native_color = np.clip(sample[2:5], 0, 255)
-        color = native_color[None, None, :]*(.38+.88*shade[..., None])
-        opacity = cv2.GaussianBlur(opacity, (0, 0), 2.8)
-        opacity = cv2.resize(opacity, (W, H), interpolation=cv2.INTER_CUBIC)
-        color = cv2.resize(color, (W, H), interpolation=cv2.INTER_CUBIC)
-        return np.clip(opacity, 0, 1)[..., None], color
+        origin = (sample[:2]-[W/2, H/2])*DISPLAY_SCALE+[W/2, H/2]
+        incoming = index >= self.journey_start
+        if incoming:
+            origin = self.last_origin
+        progress = float(smooth((time-13.0)/1.10))
+        # A single soft arc travels from real resin to the plant's luminous point.
+        # The objects and footage are never remapped by the effect.
+        a = origin/2
+        d = self.target/2
+        b = a+[-45., -34.]+sample[5:7]*14
+        c = d+[45., -23.]
+        tail = float(smooth((index-self.journey_start)/9)) if incoming else 0.
+        segments = np.linspace(tail, progress, max(2, int((progress-tail)*80)), dtype=np.float32)
+        points = np.array([(1-u)**3*a+3*(1-u)**2*u*b+3*(1-u)*u*u*c+u**3*d for u in segments])
+        head = points[-1]
+        activity = float(np.clip(sample[7]*1.5, 0, .20))
+        attack = float(smooth((time-GREEN_START_FRAME/FPS)/.60))
+        release = float(1-smooth((index-self.journey_start)/LIGHT_EXIT_FRAMES)) if incoming else 1.
+        trace = np.zeros((self.size[1], self.size[0], 3), np.float32)
+        native_color = self.last_color if incoming else sample[2:5]
+        green = native_color/np.maximum(1, native_color.max())*.74
+        violet = np.array([.48, .48, .92], np.float32)
+        for n in range(1, len(points)):
+            u = float(segments[n])
+            hue = green*(1-u)+violet*u
+            # Native velocities modulate a light reflection, not an object shape.
+            strength = (.35+.35*u+activity)*attack*release
+            cv2.line(trace, tuple(np.rint(points[n-1]).astype(int)),
+                     tuple(np.rint(points[n]).astype(int)), tuple((hue*strength).tolist()),
+                     2, cv2.LINE_AA)
+        trace = cv2.GaussianBlur(trace, (0, 0), .85)
+        soft = cv2.GaussianBlur(trace, (0, 0), 7)
+        wide = cv2.GaussianBlur(trace, (0, 0), 25)
+        trace = np.clip(trace*.25+soft*6+wide*11, 0, .80)
+        # Local green activity preserves the real emerald's moving texture.
+        # It follows the measured centroid, without creating an inset picture.
+        stone = np.exp(-.5*((self.x-a[0])/30)**2-.5*((self.y-a[1])/29)**2)
+        stone_light = stone[..., None]*green*(.12+activity)*attack*release
+        if incoming:
+            stone_light *= 0
+        # Only a short optical event covers the edit. Two adjacent frames share
+        # an exact peak; no source images are crossfaded and no fog is generated.
+        seam = (self.journey_start-.5)/FPS
+        distance = max(0., abs(time-seam)-.5/FPS)
+        pulse = float(np.exp(-(distance/.155)**2))
+        radius = 23+1080*pulse**2.2
+        gaussian = np.exp(-.5*((self.x-head[0])/radius)**2-.5*((self.y-head[1])/radius)**2)
+        bloom = 1-np.exp(-gaussian*(.28*attack*release+88*pulse**4))
+        # Warm-green activity passes through a pale optical peak into the
+        # plant's existing blue/violet emission. This colors light only.
+        incoming_hue = float(smooth((index-self.journey_start)/LIGHT_EXIT_FRAMES)) if incoming else 0.
+        local_hue = green*(1-incoming_hue)+violet*incoming_hue
+        peak_hue = np.array([.88, .96, .94], np.float32)
+        hue = local_hue*(1-pulse**1.1)+peak_hue*pulse**1.1
+        bloom_light = bloom[..., None]*hue
+        light = 1-(1-trace)*(1-stone_light)*(1-bloom_light)
+        return cv2.resize(np.clip(light, 0, 1), (W, H), interpolation=cv2.INTER_LINEAR), pulse
 
     def frame(self, index, source, incoming=False):
-        if index <= GREEN_START_FRAME:
+        if index <= GREEN_START_FRAME or (incoming and index >= self.journey_start+LIGHT_EXIT_FRAMES):
             return source
-        if incoming and index >= self.journey_start+FIELD_EXIT_FRAMES:
-            return source
-        opacity, atmosphere = self.field(index)
-        source = source.astype(np.float32)
-        if not incoming:
-            return source*(1-opacity)+atmosphere*opacity
-        visibility = smooth(1-opacity)
-        self.clarity += (visibility-self.clarity)*.18
-        u = (index-self.journey_start)/FIELD_EXIT_FRAMES
-        recovery = float(smooth((u-.75)/.25))
-        clarity = self.clarity+(1-self.clarity)*recovery
-        low = cv2.resize(source, (W//8, H//8), interpolation=cv2.INTER_AREA)
-        low = cv2.GaussianBlur(low, (0, 0), 6)
-        low = cv2.resize(low, (W, H), interpolation=cv2.INTER_LINEAR)
-        detail = visibility*clarity
-        forming_environment = low*(1-detail)+source*detail
-        material = atmosphere*(1-visibility*.45)+low*(visibility*.45)
-        return material*(1-visibility)+forming_environment*visibility
+        light, pulse = self.light(index)
+        # Additive lens light in linear RGB, never an outgoing/incoming dissolve.
+        srgb = source.astype(np.float32)/255
+        linear = np.where(srgb<=.04045, srgb/12.92, ((srgb+.055)/1.055)**2.4)
+        energy = np.where(light<=.04045, light/12.92, ((light+.055)/1.055)**2.4)
+        result = 1-(1-linear)*(1-energy)
+        result = np.where(result<=.0031308, result*12.92, 1.055*np.maximum(result,0)**(1/2.4)-.055)
+        # Sensor veiling at the optical peak conceals both shots for two frames.
+        # The shared light image makes the edit continuous rather than a snap.
+        veiling = float(smooth((pulse-.80)/.20))
+        result = result*(1-veiling)+np.array([.88,.96,.94],np.float32)*veiling
+        return np.clip(result*255,0,255)
 
 
 def main():
@@ -199,8 +198,8 @@ def main():
     hashes = {p.name: sha(p) for p in [SOURCE, JOURNEY]}
     measured = analyse_emerald()
     native_frames = len(measured)
-    journey_start = native_frames-12  # Begin moving forest while green is active.
-    bridge = EmeraldMovement(measured, journey_start)
+    journey_start = native_frames  # Journey begins once; the lens light bridges this seam.
+    bridge = EmeraldLight(measured, journey_start)
     OUT.mkdir(parents=True, exist_ok=True)
     output = OUT/'preview.mp4'
     encoder = subprocess.Popen(['ffmpeg', '-v', 'error', '-f', 'rawvideo',
@@ -219,20 +218,16 @@ def main():
     journey = decode(JOURNEY, pad=True)
     try:
         for i, source in enumerate(decode(SOURCE)):
-            incoming = i >= journey_start
-            if incoming:
-                source = next(journey)
-                journey_frames += 1
-            frame = bridge.frame(i, source, incoming=incoming)
-            if i in [0, 240, GREEN_START_FRAME, native_frames-12, native_frames-1]:
+            source = display_zaru(source)
+            frame = bridge.frame(i, source)
+            if i in [0, 240, GREEN_START_FRAME, 390, 402, 411, 416, 419, 421, 422]:
                 Image.fromarray(np.clip(frame, 0, 255).astype('uint8')).save(args.qa/f'{i:04d}.png')
             write(frame)
         assert count == native_frames
-        for source in journey:
-            j = journey_frames
+        for j, source in enumerate(journey):
             i = journey_start+j
             frame = bridge.frame(i, source, incoming=True)
-            if j in [0, 8, 16, 25, 34, 42, 100]:
+            if j in [0, 1, 3, 5, 8, 12, 19, 40, 100]:
                 Image.fromarray(np.clip(frame, 0, 255).astype('uint8')).save(args.qa/f'{i:04d}.png')
             write(frame)
             journey_frames += 1
@@ -243,18 +238,21 @@ def main():
     assert hashes == {p.name: sha(p) for p in [SOURCE, JOURNEY]}
     meta = {'width': W, 'height': H, 'fps': FPS, 'frames': count, 'duration': count/FPS,
         'zaru_source': SOURCE.name, 'zaru_source_in': 0, 'zaru_frames': native_frames,
-        'zaru_presentation': 'Authored full 1920x1080 frame; identity placement and scale.',
-        'additional_zaru_scale': 1, 'additional_zaru_crop': False,
+        'zaru_presentation': 'Whole-source 1.20 constant display enlargement, centered; substantial authored black remains. No additional animated zoom.',
+        'additional_zaru_scale': DISPLAY_SCALE, 'zaru_scale_animated': False,
+        'black_margin_trim_only': True, 'object_crop': False,
         'additional_zaru_camera_motion': False, 'source_pixel_displacement': False,
         'green_motion_start': GREEN_START_FRAME/FPS, 'journey_start': journey_start/FPS,
-        'field_clear': (journey_start+FIELD_EXIT_FRAMES)/FPS,
-        'source_clock_overlap_frames': 12,
+        'light_clear': (journey_start+LIGHT_EXIT_FRAMES)/FPS,
+        'source_clock_overlap_frames': 0,
         'journey_source_in': 0, 'journey_frames': journey_frames,
         'journey_padding': [1, 0, 1, 0], 'journey_clock': 'Single forward pass, no restart or duplicate sequence.',
-        'bridge': 'Measured native emerald movement carries a green volume through the black negative space; the full moving Journey environment resolves through its dispersal.',
+        'bridge': 'Native emerald activity → restrained light trace to the plant → brief optical lens bloom → full Journey. No fog or smoke.',
+        'plant_light_target': bridge.target.tolist(), 'optical_peak_frames': [journey_start-1,journey_start],
         'motion_measurements': {'mean_speed_px': float(measured[GREEN_START_FRAME:, 7].mean()),
                                 'origin_at_transition': measured[GREEN_START_FRAME, :2].tolist()},
-        'source_sha256': hashes, 'portal': False, 'beam': False, 'miniature_journey': False,
+        'source_sha256': hashes, 'portal': False, 'local_light_trace': True, 'miniature_journey': False,
+        'smoke': False, 'fog': False,
         'object_morphing': False, 'shot_crossfade': False,
         'locked_ophelia_shila_unchanged': True, 'other_transitions_changed': False,
         'full_hero_rendered': False}
