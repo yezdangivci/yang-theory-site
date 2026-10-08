@@ -3,7 +3,8 @@
 
 The latest direction explicitly allows a tiny travelling orb, not a beam.
 Its core size and fringe color are measured from the real Journey frame.
-No trail, smoke, portal, inset, asset deformation or added Zaru camera move.
+No trail, smoke, portal, inset or asset deformation. The only added source
+camera move is the newly requested slight exit pullback, never a push-in.
 """
 import argparse
 import hashlib
@@ -23,11 +24,13 @@ JOURNEY = ROOT/'Journey:Yez Startle video.mp4'
 OUT = ROOT/'public/previews/zaru5-journey'
 DISPLAY_SCALE = 1.40  # Slightly larger static display, never an animated zoom.
 GREEN_START_FRAME = 390  # 13.00s, the real green material is already moving.
-MATCH_EXIT_FRAMES = 45  # 1.50s native-light / native-detail resolution.
+MATCH_EXIT_FRAMES = 33  # Live Journey resolves before plant arrival.
 PLANT_POINT = np.array([651., 625.], np.float32)  # Plant under the reaching hand, +1px pad.
-ORB_FORM_FRAMES = 21  # 0.70s green concentration, readable before release.
-ORB_TRAVEL_FRAMES = 60  # 2.00s overlapping passage and environment resolution.
-JOURNEY_ENTRY_DELAY = 6  # Environment begins 0.20s after the green orb leaves.
+ORB_FORM_FRAMES = 15  # 0.50s green concentration, readable before release.
+OUTWARD_FRAMES = 18  # 0.60s approach, Zaru pullback/fade, then black.
+BLACK_PASSAGE_FRAMES = 9  # 0.30s continuous foreground passage over black.
+REENTRY_FRAMES = 42  # 1.40s curved recession into the live Journey world.
+ZARU_EXIT_PULLBACK = .08  # Latest request: slight zoom OUT only.
 CONTACT_FRAMES = 9
 cv2.setNumThreads(2)
 
@@ -117,7 +120,8 @@ class EmeraldPlantMatch:
     def __init__(self, measured, journey_start, plant_reference, plant_points):
         self.journey_start = journey_start
         self.travel_start = GREEN_START_FRAME+ORB_FORM_FRAMES
-        self.arrival = self.travel_start+ORB_TRAVEL_FRAMES
+        self.near_camera = self.travel_start+OUTWARD_FRAMES
+        self.arrival = journey_start+REENTRY_FRAMES
         self.origins = (measured-[W/2,H/2])*DISPLAY_SCALE+[W/2,H/2]
         self.anchor = self.origins[self.travel_start].copy()
         self.plant_points = plant_points
@@ -136,7 +140,7 @@ class EmeraldPlantMatch:
     def orb(self,point,amount=1.,color=None,scale=1.):
         """A firefly-size point only: no line, trail, streak or large flare."""
         field = np.zeros((H,W,3),np.float32)
-        # Even at closest approach the core is <12px, with no long trail.
+        # Small colored core; modest growth at the lens, no streak or trail.
         radius = int(np.ceil(18*scale))
         x0,y0 = np.floor(point-radius).astype(int)
         x1,y1 = x0+radius*2,y0+radius*2
@@ -160,10 +164,14 @@ class EmeraldPlantMatch:
         origin = self.origins[min(index,len(self.origins)-1)]
         local = np.exp(-((self.x-origin[0])**2+(self.y-origin[1])**2)/(2*10**2))
         rgb = 1-(1-rgb)*(1-local[...,None]*np.array([.10,.95,.32])*formed*.16)
-        # Only the outgoing shot loses exposure. The orb has its own continuous
-        # clock across this source boundary; the pendant is never warped.
+        # The newly requested exit-only pullback creates an independent depth
+        # cue: photographed Zaru recedes while its emitted green light advances.
+        # The source's own movement continues; no added push-in or deformation.
         exposure = float(smooth((index-self.travel_start)/(len(self.origins)-1-self.travel_start)))
         if exposure > 0:
+            matrix = cv2.getRotationMatrix2D((W/2,H/2),0,1-ZARU_EXIT_PULLBACK*exposure)
+            rgb = cv2.warpAffine(rgb,matrix,(W,H),flags=cv2.INTER_LANCZOS4,
+                                 borderMode=cv2.BORDER_CONSTANT,borderValue=0)
             rgb = cv2.GaussianBlur(rgb,(0,0),.1+exposure*1.7)*(1-exposure)
         return rgb
 
@@ -190,33 +198,65 @@ class EmeraldPlantMatch:
         resolved = (low*(1-clarity[...,None])+rgb*clarity[...,None])*visibility[...,None]
         return resolved
 
+    @staticmethod
+    def camera_point(screen,distance):
+        """Unproject screen coordinates onto a positive camera-distance plane."""
+        return np.array([(screen[0]-W/2)*distance,
+                         (screen[1]-H/2)*distance,distance],np.float64)
+
+    @staticmethod
+    def bezier(points,t):
+        return ((1-t)**3*points[0]+3*(1-t)**2*t*points[1]
+                +3*(1-t)*t*t*points[2]+t**3*points[3])
+
     def orb_state(self,index):
         formed = float(smooth((index-GREEN_START_FRAME)/ORB_FORM_FRAMES))
-        travel = float(np.clip((index-self.travel_start)/ORB_TRAVEL_FRAMES,0,1))
-        color_mix = float(smooth((travel-.10)/.55))
-        color = np.array([.10,.95,.32])*(1-color_mix)+self.lilac*color_mix
+        color = np.array([.10,.95,.32])
         j = int(np.clip(index-self.journey_start,0,len(self.plant_points)-1))
         target = self.plant_points[j]
-        progress = float(smooth(travel))
+        lens = np.array([self.anchor[0]+8.,self.anchor[1]-51.])
+        entry = np.array([945.,552.])
         if index < self.travel_start:
             point = self.origins[min(index,len(self.origins)-1)].copy()
             size = .55+.45*formed
+            brightness = .84
         else:
-            # Project a shallow 3D passage: a modest approach to camera then
-            # recession into the native plant plane, with no streak or beam.
-            depth = .24*np.sin(travel*np.pi)
-            size = 1/(1-depth)
-            world = self.anchor*(1-progress)+target*progress
-            world[1] -= 14*np.sin(travel*np.pi)
-            point = np.array([W/2,H/2])+(world-[W/2,H/2])*size
-        amount = formed*(1-float(smooth((index-self.arrival)/CONTACT_FRAMES)))
+            # Three camera-space trajectories, not an anchor-to-plant tween.
+            # First come forward on the emerald's own ray (no sideways flight).
+            # Then traverse the lens plane over BLACK. Finally recede along a
+            # separate 3D arc into Journey, following its actual moving plant.
+            if index < self.near_camera:
+                t = float(smooth((index-self.travel_start)/OUTWARD_FRAMES))
+                controls = [self.camera_point(self.anchor,2.),
+                    self.camera_point(self.anchor+[0,-8],1.80),
+                    self.camera_point(lens+[0,10],1.18),
+                    self.camera_point(lens,1.08)]
+            elif index < self.journey_start:
+                t = float(smooth((index-self.near_camera)/BLACK_PASSAGE_FRAMES))
+                controls = [self.camera_point(lens,1.08),
+                    self.camera_point(lens+[-6,-3],1.08),
+                    self.camera_point(entry+[8,6],1.10),
+                    self.camera_point(entry,1.16)]
+            else:
+                t = float(smooth((index-self.journey_start)/REENTRY_FRAMES))
+                controls = [self.camera_point(entry,1.16),
+                    self.camera_point([930.,460.],1.30),
+                    self.camera_point(target+[-45.,-90.],1.72),
+                    self.camera_point(target,2.)]
+                color_mix = float(smooth((t-.06)/.58))
+                color = color*(1-color_mix)+self.lilac*color_mix
+            position = self.bezier(controls,t)
+            point = np.array([W/2,H/2])+position[:2]/position[2]
+            size = 2/position[2]
+            brightness = .84+.16*smooth((size-1)/(.85))
+        amount = formed*brightness*(1-float(smooth((index-self.arrival)/CONTACT_FRAMES)))
         return point,color,size,amount
 
     def frame(self,index,zaru,journey):
         outgoing = self.zaru_frame(index,zaru)
         incoming = self.journey_frame(index-self.journey_start,journey)
-        # Only a few very dark incoming frames overlap the outgoing source.
-        # No incoming miniature in the stone; the environment is always 1:1.
+        # Outgoing and incoming scenes never overlap: a true black lens passage
+        # separates them while the same continuous green orb stays foreground.
         rgb = 1-(1-outgoing)*(1-incoming)
         if GREEN_START_FRAME <= index < self.arrival+CONTACT_FRAMES:
             point,color,size,amount = self.orb_state(index)
@@ -234,7 +274,7 @@ def main():
     measured = analyse_emerald()
     native_frames = len(measured)
     plant_points = analyse_plant()
-    journey_start = GREEN_START_FRAME+ORB_FORM_FRAMES+JOURNEY_ENTRY_DELAY
+    journey_start = GREEN_START_FRAME+ORB_FORM_FRAMES+OUTWARD_FRAMES+BLACK_PASSAGE_FRAMES
     journey = decode(JOURNEY, pad=True)
     first_journey = next(journey)
     bridge = EmeraldPlantMatch(measured, journey_start, first_journey,plant_points)
@@ -265,7 +305,7 @@ def main():
                 journey_source = next(journey_stream)
                 journey_frames += 1
             frame = bridge.frame(i,zaru,journey_source)
-            if i in [0,240,390,402,410,411,416,417,421,422,423,429,438,447,456,462,470,471,475,480,517,566]:
+            if i in [0,240,390,402,405,410,416,421,422,423,427,431,432,438,447,456,465,473,474,479,483,532,581]:
                 Image.fromarray(np.clip(frame, 0, 255).astype('uint8')).save(args.qa/f'{i:04d}.png')
             write(frame)
         assert zaru_frames == native_frames
@@ -278,17 +318,22 @@ def main():
     assert hashes == {p.name: sha(p) for p in [SOURCE, JOURNEY]}
     meta = {'width': W, 'height': H, 'fps': FPS, 'frames': count, 'duration': count/FPS,
         'zaru_source': SOURCE.name, 'zaru_source_in': 0, 'zaru_frames': native_frames,
-        'zaru_presentation': 'Whole-source constant 1.40 display size, centered, original motion and black negative space preserved.',
-        'additional_zaru_scale': DISPLAY_SCALE, 'zaru_scale_animated': False,
+        'zaru_presentation': 'Whole source from 00:00 at 1.40 display size, centered on black; latest requested 8% exit-only pullback as green orb approaches camera.',
+        'additional_zaru_scale': DISPLAY_SCALE, 'zaru_scale_animated': 'Exit-only 8% pullback, explicitly requested; never an added push-in.',
+        'zaru_added_zoom_in': False, 'zaru_exit_pullback': ZARU_EXIT_PULLBACK,
         'black_margin_trim_only': True, 'object_crop': False,
-        'additional_zaru_camera_motion': False, 'source_pixel_displacement': False,
+        'additional_zaru_camera_motion': 'Exit-only pullback', 'source_pixel_displacement': False,
         'green_motion_start': GREEN_START_FRAME/FPS, 'journey_start': journey_start/FPS,
         'match_clear': (bridge.arrival+CONTACT_FRAMES)/FPS,
         'journey_resolution_clear': (journey_start+MATCH_EXIT_FRAMES)/FPS,
-        'source_clock_overlap_frames': native_frames-journey_start,
+        'source_clock_overlap_frames': max(0,native_frames-journey_start),
+        'outward_passage_start': bridge.travel_start/FPS,
+        'near_camera': bridge.near_camera/FPS,
+        'black_passage_start': native_frames/FPS,
+        'black_passage_frames': journey_start-native_frames,
         'journey_source_in': 0, 'journey_frames': journey_frames,
         'journey_padding': [1, 0, 1, 0], 'journey_clock': 'Single forward pass, no restart or duplicate sequence.',
-        'bridge': 'Green concentration → green orb release → 2s depth passage with green-to-blue shift and progressive live Journey resolution → moving plant contact.',
+        'bridge': 'Green glow → green orb approaches camera while Zaru pulls back into black → continuous black lens passage → green-to-blue curved recession into live Journey → moving plant contact.',
         'match_anchor': bridge.anchor.tolist(), 'native_plant_point': PLANT_POINT.tolist(),
         'orb_formation_start': GREEN_START_FRAME/FPS,
         'orb_formation_end': (GREEN_START_FRAME+ORB_FORM_FRAMES)/FPS,
@@ -296,8 +341,8 @@ def main():
         'orb_arrival': bridge.arrival/FPS,
         'transformation_duration': (bridge.arrival-GREEN_START_FRAME)/FPS,
         'orb_release_color': [25.5,242.25,81.6],
-        'orb_max_core_diameter': bridge.core_diameter/(1-.24),
-        'orb_depth_projection': 'Shallow perspective projection, maximum 1.316 orb-only scale; source media never animated in scale.',
+        'orb_max_core_diameter': bridge.core_diameter*2/1.08,
+        'orb_depth_projection': 'Three camera-space cubic curves: outbound distance 2→1.08; black foreground passage 1.08→1.16; curved Journey entry 1.16→2. Perspective projection, depth-driven core/halo size and brightness.',
         'orb_core_diameter': bridge.core_diameter,
         'orb_lilac_fringe_rgb': (bridge.lilac*255).round(3).tolist(),
         'orb_travel_distance_pixels': float(np.linalg.norm(bridge.anchor-plant_points[bridge.arrival-journey_start])),

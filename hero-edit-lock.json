@@ -22,7 +22,7 @@
   },
   "remaining_junctions": {
     "review_only": true,
-    "zaru_to_journey_intent": "Green glow inside emerald → small GREEN orb leaves → 2s shallow-depth travel and smooth GREEN-to-BLUE shift, with live Journey progressively resolving DURING travel → merge into the tracked plant glow beneath the reaching hand. Total formation/passage 2.7s. No beam, trail, portal, smoke, object deformation or camera scaling of Zaru.",
+    "zaru_to_journey_intent": "Green glow inside emerald → GREEN orb comes toward viewer while Zaru pulls back 8% and fades → GREEN foreground passage over BLACK → Journey begins once from black → curved camera-space recession into Journey with GREEN-to-BLUE shift → tracked luminous plant beneath reaching hand. Total transformation 2.8s. No continuous flat anchor-to-plant tween, beam, smoke, inset, portal, white dot or abrupt cut.",
     "shila_to_burton_intent": "Exact Shila-eye to Burton-eye alignment.",
     "burton_to_maker": "Original uninterrupted yez_ekran_final_web.mp4 source footage."
   },
@@ -31,8 +31,8 @@
     "source": "zaru5.mp4",
     "source_in_seconds": 0,
     "source_sha256": "125866b6919df4b2498e97d8b6b5f040232ba5ab687d7eae9944f221a8cde6ff",
-    "presentation": "Whole Zaru 5 source from 00:00 at constant 1.40 display size, slightly larger, centered on substantial black negative space. Source internal movement preserved; no additional animated zoom.",
-    "intent": "Green glow inside emerald → small GREEN orb leaves → 2s shallow-depth travel and smooth GREEN-to-BLUE shift, with live Journey progressively resolving DURING travel → merge into the tracked plant glow beneath the reaching hand. Total formation/passage 2.7s. No beam, trail, portal, smoke, object deformation or camera scaling of Zaru.",
+    "presentation": "Zaru 5 starts at 00:00, original source motion at moderate 1.40 display size. Latest explicit request adds ONLY an 8% exit pullback/fade as the orb advances. No added zoom-in.",
+    "intent": "Green glow inside emerald → GREEN orb comes toward viewer while Zaru pulls back 8% and fades → GREEN foreground passage over BLACK → Journey begins once from black → curved camera-space recession into Journey with GREEN-to-BLUE shift → tracked luminous plant beneath reaching hand. Total transformation 2.8s. No continuous flat anchor-to-plant tween, beam, smoke, inset, portal, white dot or abrupt cut.",
     "forbidden": [
       "beam",
       "ray",
@@ -46,19 +46,22 @@
       "full-screen flat green wash",
       "object morphing",
       "generic full-frame crossfade",
-      "extra animated Zaru zoom",
       "Journey restart",
       "laser",
       "long travelling streak",
       "large orb",
-      "full-screen flash"
+      "full-screen flash",
+      "added Zaru zoom-in",
+      "flat same-plane orb movement",
+      "Journey before black lens passage"
     ],
     "preview": "public/previews/zaru5-journey/preview.mp4",
     "renderer": "scripts/render_zaru5_journey_preview.py",
-    "legacy_status": "Stone insets, green fog and beams remain rejected. The short blue-only orb pass is superseded by this latest green-release/depth-passage revision. Do not render the full hero.",
+    "legacy_status": "Stone insets, green fog and beams remain rejected. The prior shallow same-plane passage is superseded by this explicit outbound → black → curved inbound camera-space passage. Do not render the full hero.",
     "display_scale": 1.4,
-    "display_scale_animated": false,
-    "review_version": "zaru5-depth-passage-5",
-    "allowed_energy_transfer": "Tiny orb leaves GREEN, shifts BLUE during a 2s projected depth passage; slight orb-only approach/recession. Live Journey begins once during travel and is readable before tracked plant contact."
+    "display_scale_animated": "Exit-only 8% pullback",
+    "review_version": "zaru5-depth-passage-6",
+    "allowed_energy_transfer": "Three perspective-projected camera-space trajectories: GREEN outbound approach; continuous GREEN foreground crossing over BLACK; curved recession into live Journey, changing GREEN to BLUE only during re-entry. Tiny core grows from 8.7px to 16.2px near the lens, then returns to native firefly scale.",
+    "added_zoom_in": false
   }
 }
