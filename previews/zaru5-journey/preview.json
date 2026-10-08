@@ -1,0 +1,48 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "frames": 561,
+  "duration": 18.7,
+  "zaru_source": "zaru5.mp4",
+  "zaru_source_in": 0,
+  "zaru_frames": 423,
+  "zaru_presentation": "Authored full 1920x1080 frame; identity placement and scale.",
+  "additional_zaru_scale": 1,
+  "additional_zaru_crop": false,
+  "additional_zaru_camera_motion": false,
+  "source_pixel_displacement": false,
+  "green_motion_start": 12.1,
+  "journey_start": 13.7,
+  "field_clear": 15.1,
+  "source_clock_overlap_frames": 12,
+  "journey_source_in": 0,
+  "journey_frames": 150,
+  "journey_padding": [
+    1,
+    0,
+    1,
+    0
+  ],
+  "journey_clock": "Single forward pass, no restart or duplicate sequence.",
+  "bridge": "Measured native emerald movement carries a green volume through the black negative space; the full moving Journey environment resolves through its dispersal.",
+  "motion_measurements": {
+    "mean_speed_px": 0.06665144860744476,
+    "origin_at_transition": [
+      974.14794921875,
+      585.392822265625
+    ]
+  },
+  "source_sha256": {
+    "zaru5.mp4": "125866b6919df4b2498e97d8b6b5f040232ba5ab687d7eae9944f221a8cde6ff",
+    "Journey:Yez Startle video.mp4": "af3194e2f340a0e71b5a994a48565c5a1f609fd27c503a8bd7a7d94d065d68c7"
+  },
+  "portal": false,
+  "beam": false,
+  "miniature_journey": false,
+  "object_morphing": false,
+  "shot_crossfade": false,
+  "locked_ophelia_shila_unchanged": true,
+  "other_transitions_changed": false,
+  "full_hero_rendered": false
+}
