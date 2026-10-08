@@ -2,16 +2,45 @@
   "width": 1920,
   "height": 1080,
   "fps": 30,
-  "frames": 342,
-  "duration": 11.4,
+  "frames": 363,
+  "duration": 12.1,
   "ophelia_source_in": 11.6,
   "red_bridge_start": 1.4,
-  "red_bridge_duration": 4.133333333333334,
-  "png_start": 1.9333333333333333,
+  "red_bridge_duration": 4.833333333333333,
+  "png_start": 2.4,
   "zoom_starts_under_smoke": true,
-  "zoom_overlap_frames": 108,
-  "smoke_clear_frame": 159,
-  "formation_complete_frame": 161,
+  "zoom_overlap_frames": 115,
+  "smoke_clear_frame": 179,
+  "formation_complete_frame": 180,
+  "field_timing_seconds": [
+    0.0,
+    0.36,
+    0.85,
+    1.1,
+    1.28,
+    1.65,
+    2.1,
+    2.7,
+    3.25,
+    3.95,
+    4.56,
+    4.8
+  ],
+  "field_timing_phases": [
+    0.0,
+    0.055,
+    0.116,
+    0.148,
+    0.23,
+    0.26,
+    0.285,
+    0.32,
+    0.41,
+    0.62,
+    0.95,
+    1.0
+  ],
+  "readable_transformation_seconds": 2.7,
   "initial_native_scale": 1.0,
   "initial_garment_native_point": [
     1800,
@@ -19,9 +48,9 @@
   ],
   "initial_garment_screen_point": [
     947,
-    600
+    565
   ],
-  "video_handoff": 5.533333333333333,
+  "video_handoff": 6.233333333333333,
   "video_source_in": 0,
   "complete_shila_video": true,
   "original_files_sha256": {
@@ -42,7 +71,7 @@
     ],
     "registration_median_error_px": 0.7612966299057007
   },
-  "treatment": "Original Ophelia at 13s; smoke-density matte resolves Shila visibility, contrast and texture locally while a tighter, higher garment camera moves continuously; same final clock framing and uncorrected shila_final.mp4.",
+  "treatment": "Original Ophelia at 13s; retimed integrated field gives the red-source bloom and smoke-to-garment formation 2.7 seconds of reading time; tighter, slightly higher dress crop moves continuously through locally resolving density and detail; same final clock framing and uncorrected shila_final.mp4.",
   "smoke_controls_reveal": [
     "opacity",
     "local_contrast",
@@ -53,6 +82,6 @@
   "source_deformation": false,
   "shot_crossfade": false,
   "shila_color_correction": false,
-  "zoom_frames": 108,
+  "zoom_frames": 115,
   "full_hero_rendered": false
 }

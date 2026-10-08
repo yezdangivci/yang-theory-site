@@ -14,6 +14,12 @@ def smooth(t):
 
 
 class RedSmokeBridge:
+    # Retime the established field, rather than append a hold or another effect.
+    # The red source, peak cover and gradual garment formation now have distinct,
+    # overlapping reading time. C1 monotone interpolation keeps the plume moving.
+    EVENT_SECONDS = np.array([0, .36, .85, 1.10, 1.28, 1.65, 2.10, 2.70, 3.25, 3.95, 4.56, 4.80])
+    EVENT_PHASES = np.array([0, .055, .116, .148, .23, .26, .285, .32, .41, .62, .95, 1])
+
     def __init__(self, width=1920, height=1080, origin=(947, 760)):
         self.width, self.height = width, height
         self.origin = np.asarray(origin, np.float32)/4
@@ -29,17 +35,36 @@ class RedSmokeBridge:
             self.fields.append(cv2.GaussianBlur(values, (0, 0), sigma))
         self.lobes = []
         self.clarity = np.zeros((height, width, 1), np.float32)
+        intervals = np.diff(self.EVENT_SECONDS)
+        slopes = np.diff(self.EVENT_PHASES)/intervals
+        self.timing_slopes = np.r_[slopes[0], np.zeros(len(slopes)-1), slopes[-1]]
+        for i in range(1, len(slopes)):
+            w1, w2 = 2*intervals[i]+intervals[i-1], intervals[i]+2*intervals[i-1]
+            self.timing_slopes[i] = (w1+w2)/(w1/slopes[i-1]+w2/slopes[i])
         for i in range(19):
             theta = i*2.399963 + rng.uniform(-.22, .22)
             self.lobes.append((theta, rng.uniform(.35, 1), rng.uniform(.7, 1.25),
                                rng.uniform(.7, 1.1), rng.uniform(-1, 1)))
 
+    def event_progress(self, progress):
+        seconds = float(np.clip(progress, 0, 1))*self.EVENT_SECONDS[-1]
+        i = min(np.searchsorted(self.EVENT_SECONDS, seconds, side='right')-1,
+                len(self.EVENT_SECONDS)-2)
+        duration = self.EVENT_SECONDS[i+1]-self.EVENT_SECONDS[i]
+        t = (seconds-self.EVENT_SECONDS[i])/duration
+        a, b = self.EVENT_PHASES[i:i+2]
+        da, db = self.timing_slopes[i:i+2]
+        return float((2*t**3-3*t*t+1)*a+(t**3-2*t*t+t)*duration*da
+                     +(-2*t**3+3*t*t)*b+(t**3-t*t)*duration*db)
+
     def layer(self, progress):
-        p = float(np.clip(progress, 0, 1))
+        p = self.event_progress(progress)
         # The original short emission opens into a field that keeps evolving
         # throughout the camera move, rather than extinguishing before it.
         expansion = float(smooth(min(p/.22, 1)))
-        phase = p*2.58
+        # Drift is continuous in real time even while the density/reveal
+        # envelope spends longer in its formative middle portion.
+        phase = float(progress)*2.58
         radius = 5+390*expansion**1.45
         ox, oy = self.origin
         nx = self.x+17*np.sin(self.y/49+phase*2.0)+45*phase
@@ -116,7 +141,7 @@ class RedSmokeBridge:
         # Density itself is the spatial transition matte. Different patches
         # resolve as their local cloud thins, never from a global shot opacity.
         visibility = smooth(1-opacity)
-        self.clarity += (visibility-self.clarity)*.12
+        self.clarity += (visibility-self.clarity)*.075
         # Finish the optical recovery continuously while the camera keeps moving.
         completion = float(smooth((progress-.84)/.12))
         clarity = self.clarity+(1-self.clarity)*completion
@@ -138,13 +163,14 @@ class RedSmokeBridge:
         if progress >= 1:
             return incoming.copy()
         opacity, smoke = self.layer(progress)
+        event = self.event_progress(progress)
         # Ophelia loses visibility inside the cloud. Shila starts with no clean
         # detail at all, then is constructed from the same local density field.
-        exit_strength = float(1-smooth((progress-.116)/.032))
+        exit_strength = float(1-smooth((event-.116)/.032))
         outgoing_weight = (1-opacity)*exit_strength
-        if progress <= .148:
+        if event <= .148:
             return outgoing*outgoing_weight+smoke*(1-outgoing_weight)
-        formed, incoming_weight, broad_color = self.formation(incoming, opacity, progress)
+        formed, incoming_weight, broad_color = self.formation(incoming, opacity, event)
         # Real garment light/color diffuses into the cloud itself; recognizable
         # painted detail then resolves locally from that same medium.
         color_transfer = incoming_weight**.7*.50

@@ -24,8 +24,8 @@ W, H, FPS = 1920, 1080, 30
 IVORY = np.array([244, 233, 225], np.float32)
 OPHELIA_IN = 11.6
 OPHELIA_FRAMES = 42  # 11.6–13.0s: emit from the original red stone at 13s.
-ZOOM_FRAMES = 108
-ZOOM_START = 16  # Begin camera motion under expanding smoke, not after it.
+ZOOM_FRAMES = 115
+ZOOM_START = 30  # Moving before garment formation, underneath the peak cloud.
 BRIDGE_FRAMES = ZOOM_START+ZOOM_FRAMES  # Field and camera share the whole move.
 ZOOM_OVERLAP = BRIDGE_FRAMES-ZOOM_START
 SHILA_FRAMES = 176
@@ -98,7 +98,7 @@ class Handoff:
         t = index/(ZOOM_FRAMES-1)
         # Nonzero starting velocity: the emerging garment is already moving.
         # Decelerate smoothly into the unchanged full-clock composition.
-        progress = float(.30*t+2.40*t*t-1.70*t*t*t)
+        progress = float(6*t**5-15*t**4+10*t**3+.08*t*(1-t)**2)
         final_scale = np.hypot(self.end[0, 0], self.end[1, 0])
         initial_scale = 1.0  # Tightest native-pixel framing, without upscaling.
         scale = np.exp(np.log(initial_scale)*(1-progress)+np.log(final_scale)*progress)
@@ -110,7 +110,7 @@ class Handoff:
                         [scale*np.sin(angle), scale*np.cos(angle)]]
         # Raise the tighter bodice detail; scale and placement travel together
         # along one camera path into the unchanged centered full clock.
-        red_position = np.array([947., 600.])*(1-progress)+(self.end @ np.r_[red_native, 1])*progress
+        red_position = np.array([947., 565.])*(1-progress)+(self.end @ np.r_[red_native, 1])*progress
         matrix[:, 2] = red_position-matrix[:, :2] @ red_native
         return matrix, scale, t
 
@@ -181,9 +181,9 @@ def main():
             # Continue the same indices after the cloud; never restart at zero.
             moving_shila = match.png_frame(max(0, i-ZOOM_START))
             progress = i/(BRIDGE_FRAMES-1)
-            outgoing = ophelia(tail[min(OPHELIA_FRAMES+i, len(tail)-1)]) if progress < .148 else moving_shila
+            outgoing = ophelia(tail[min(OPHELIA_FRAMES+i, len(tail)-1)]) if bridge.event_progress(progress) <= .148 else moving_shila
             material = bridge.frame(progress, outgoing, moving_shila)
-            if i in [6, 18, 25, 35, 50, 65, 80, 95, 110, 123]:
+            if i in [6, 18, 25, 33, 42, 57, 72, 81, 96, 111, 129, 144]:
                 Image.fromarray(material.astype('uint8')).save(args.qa/f'red-smoke-{i}.png')
             write(material)
         for i in range(ZOOM_OVERLAP, ZOOM_FRAMES):
@@ -199,13 +199,16 @@ def main():
         'ophelia_source_in': OPHELIA_IN, 'red_bridge_start': OPHELIA_FRAMES/FPS,
         'red_bridge_duration': BRIDGE_FRAMES/FPS, 'png_start': (OPHELIA_FRAMES+ZOOM_START)/FPS,
         'zoom_starts_under_smoke': True, 'zoom_overlap_frames': ZOOM_OVERLAP,
-        'smoke_clear_frame': OPHELIA_FRAMES+int(np.ceil(.95*(BRIDGE_FRAMES-1))),
-        'formation_complete_frame': OPHELIA_FRAMES+int(np.ceil(.96*(BRIDGE_FRAMES-1))),
+        'smoke_clear_frame': OPHELIA_FRAMES+int(np.ceil(4.56*FPS)),
+        'formation_complete_frame': OPHELIA_FRAMES+int(np.ceil(4.60*FPS)),
+        'field_timing_seconds': bridge.EVENT_SECONDS.tolist(),
+        'field_timing_phases': bridge.EVENT_PHASES.tolist(),
+        'readable_transformation_seconds': 2.70,
         'initial_native_scale': 1.0, 'initial_garment_native_point': [1800, 3750],
-        'initial_garment_screen_point': [947, 600],
+        'initial_garment_screen_point': [947, 565],
         'video_handoff': HANDOFF_FRAME/FPS, 'video_source_in': 0, 'complete_shila_video': True,
         'original_files_sha256': hashes, 'handoff_metrics': metrics,
-        'treatment': 'Original Ophelia at 13s; smoke-density matte resolves Shila visibility, contrast and texture locally while a tighter, higher garment camera moves continuously; same final clock framing and uncorrected shila_final.mp4.',
+        'treatment': 'Original Ophelia at 13s; retimed integrated field gives the red-source bloom and smoke-to-garment formation 2.7 seconds of reading time; tighter, slightly higher dress crop moves continuously through locally resolving density and detail; same final clock framing and uncorrected shila_final.mp4.',
         'smoke_controls_reveal': ['opacity', 'local_contrast', 'sharpness'],
         'clean_shila_under_smoke': False,
         'ophelia_smoke_source_time': OPHELIA_IN+OPHELIA_FRAMES/FPS,
