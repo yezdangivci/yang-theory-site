@@ -22,7 +22,7 @@
   },
   "remaining_junctions": {
     "review_only": true,
-    "zaru_to_journey_intent": "Green glow inside emerald → GREEN orb comes toward viewer while Zaru pulls back 8% and fades → GREEN foreground passage over BLACK → Journey begins once from black → curved camera-space recession into Journey with GREEN-to-BLUE shift → tracked luminous plant beneath reaching hand. Total transformation 2.8s. No continuous flat anchor-to-plant tween, beam, smoke, inset, portal, white dot or abrupt cut.",
+    "zaru_to_journey_intent": "AUTHORITATIVE FOUR-FRAME IMAGE, left-to-right MOTION keyframes, not cuts: small GREEN orb separates → MUCH larger GREEN foreground orb with Zaru receding/darkening → smaller GREEN/TEAL/BLUE-VIOLET orb travelling away over BLACK → live Journey resolves and the blue orb follows a curved path into its tracked plant glow. Smooth camera-space interpolation; no stationary orb/background swap, flat dot, beam or source deformation.",
     "shila_to_burton_intent": "Exact Shila-eye to Burton-eye alignment.",
     "burton_to_maker": "Original uninterrupted yez_ekran_final_web.mp4 source footage."
   },
@@ -31,8 +31,8 @@
     "source": "zaru5.mp4",
     "source_in_seconds": 0,
     "source_sha256": "125866b6919df4b2498e97d8b6b5f040232ba5ab687d7eae9944f221a8cde6ff",
-    "presentation": "Zaru 5 starts at 00:00, original source motion at moderate 1.40 display size. Latest explicit request adds ONLY an 8% exit pullback/fade as the orb advances. No added zoom-in.",
-    "intent": "Green glow inside emerald → GREEN orb comes toward viewer while Zaru pulls back 8% and fades → GREEN foreground passage over BLACK → Journey begins once from black → curved camera-space recession into Journey with GREEN-to-BLUE shift → tracked luminous plant beneath reaching hand. Total transformation 2.8s. No continuous flat anchor-to-plant tween, beam, smoke, inset, portal, white dot or abrupt cut.",
+    "presentation": "Zaru 5 starts at 00:00, original source motion at moderate 1.40 display size. The supplied choreography authorizes an exit-only 16% pullback/fade; never an additional push-in.",
+    "intent": "AUTHORITATIVE FOUR-FRAME IMAGE, left-to-right MOTION keyframes, not cuts: small GREEN orb separates → MUCH larger GREEN foreground orb with Zaru receding/darkening → smaller GREEN/TEAL/BLUE-VIOLET orb travelling away over BLACK → live Journey resolves and the blue orb follows a curved path into its tracked plant glow. Smooth camera-space interpolation; no stationary orb/background swap, flat dot, beam or source deformation.",
     "forbidden": [
       "beam",
       "ray",
@@ -49,19 +49,20 @@
       "Journey restart",
       "laser",
       "long travelling streak",
-      "large orb",
       "full-screen flash",
       "added Zaru zoom-in",
       "flat same-plane orb movement",
-      "Journey before black lens passage"
+      "Journey before black lens passage",
+      "four keyframes treated as cuts",
+      "stationary orb with background changes"
     ],
     "preview": "public/previews/zaru5-journey/preview.mp4",
     "renderer": "scripts/render_zaru5_journey_preview.py",
-    "legacy_status": "Stone insets, green fog and beams remain rejected. The prior shallow same-plane passage is superseded by this explicit outbound → black → curved inbound camera-space passage. Do not render the full hero.",
+    "legacy_status": "The prior tiny-dot depth tests are superseded by the authoritative four-motion-keyframe image. Stone insets, green fog and beams remain rejected. Render only this preview, not the full hero.",
     "display_scale": 1.4,
-    "display_scale_animated": "Exit-only 8% pullback",
-    "review_version": "zaru5-depth-passage-6",
-    "allowed_energy_transfer": "Three perspective-projected camera-space trajectories: GREEN outbound approach; continuous GREEN foreground crossing over BLACK; curved recession into live Journey, changing GREEN to BLUE only during re-entry. Tiny core grows from 8.7px to 16.2px near the lens, then returns to native firefly scale.",
+    "display_scale_animated": "Exit-only 16% pullback",
+    "review_version": "zaru5-keyframe-passage-7",
+    "allowed_energy_transfer": "The latest supplied image explicitly requires much larger close-camera energy, superseding the old 16px maximum. Continuous 35px separated → 200px near-camera → shrinking 70px over BLACK → native 8.7px plant merge. GREEN→TEAL→BLUE/VIOLET completes over black, before Journey appears. Source artworks are never enlarged or distorted to create the energy.",
     "added_zoom_in": false
   }
 }

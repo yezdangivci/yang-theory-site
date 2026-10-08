@@ -15,9 +15,9 @@
       "slug": "zaru-journey",
       "title": "Zaru 5 → Journey",
       "file": "../zaru5-journey/preview.mp4",
-      "frames": 582,
-      "duration": 19.4,
-      "junction_time": 15.8,
+      "frames": 594,
+      "duration": 19.8,
+      "junction_time": 16.0,
       "green_motion_start": 13.0,
       "provenance": "Green glow → green orb approaches camera while Zaru pulls back into black → continuous black lens passage → green-to-blue curved recession into live Journey → moving plant contact.",
       "source": "zaru5.mp4",
@@ -25,37 +25,41 @@
       "additional_scale": 1.4,
       "crop": false,
       "additional_camera_motion": "Exit-only pullback",
-      "sha256": "f81480e942bbc659a7d4c1b8940c7f0879ca42064df47ec1a6927192b8bec0b3",
-      "scale_animated": "Exit-only 8% pullback, explicitly requested; never an added push-in.",
-      "match_clear": 16.1,
+      "sha256": "e13396ca4bccf4500b76beb5ab466e783987bc2b946bc7d107ada8dddd7871bd",
+      "scale_animated": "Exit-only 16% pullback; never an added push-in.",
+      "match_clear": 16.3,
       "match_anchor": [
-        995.4698852539062,
-        618.22841796875
+        995.0826293945313,
+        618.0649536132812
       ],
       "journey_initial_offset": [
         0,
         0
       ],
       "orb_formation_start": 13.0,
-      "orb_formation_end": 13.5,
-      "orb_travel_start": 13.5,
-      "orb_arrival": 15.8,
+      "orb_formation_end": 13.4,
+      "orb_travel_start": 13.4,
+      "orb_arrival": 16.0,
       "orb_core_diameter": 8.743416490252569,
       "native_plant_point": [
         651.0,
         625.0
       ],
       "plant_arrival_point": [
-        649.4803466796875,
-        625.5048217773438
+        649.46044921875,
+        625.4364013671875
       ],
-      "journey_start": 14.4,
-      "journey_resolution_clear": 15.5,
-      "transformation_duration": 2.8,
+      "journey_start": 14.8,
+      "journey_resolution_clear": 15.766666666666667,
+      "transformation_duration": 3.0,
       "near_camera": 14.1,
       "black_passage_start": 14.1,
-      "black_passage_frames": 9,
-      "zaru_exit_pullback": 0.08
+      "black_passage_frames": 21,
+      "zaru_exit_pullback": 0.16,
+      "orb_max_core_diameter": 200.0,
+      "orb_separated_core_diameter": 35.0,
+      "orb_reentry_core_diameter": 70.0,
+      "orb_color_shift_background": "GREEN → TEAL → BLUE/VIOLET during recession over BLACK, before Journey begins."
     },
     {
       "slug": "journey-seek-magic",
