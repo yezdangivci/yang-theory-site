@@ -1,0 +1,81 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "snapshot_commit": "26ad392b12ecf279fa61383762ba9c80080c6a18",
+  "stored_master_sha256": "a7e88ab61b0bbb55e25fc44d219c28bc367ead896d69c1674bb7f9326d8ba4bd",
+  "full_hero_rendered": false,
+  "remaining_transitions_redesigned": false,
+  "approved_ophelia_shila_unchanged": true,
+  "ophelia_source_in": 9,
+  "known_zaru_mismatch": "The stored master still contains the older stone inset/light breakout. It is shown unchanged; the intended emerald-movement edit remains the requirement.",
+  "shila_burton_intent": "Exact Shila-eye to Burton-eye alignment.",
+  "burton_maker_unchanged": true,
+  "clips": [
+    {
+      "slug": "zaru-journey",
+      "title": "Zaru \u2192 Journey",
+      "frames": 180,
+      "duration": 6.0,
+      "junction_time": 3.0,
+      "context_before": 3.0,
+      "context_after": 3.0,
+      "stored_master_context": [
+        12.1,
+        18.1
+      ],
+      "provenance": "Existing stored master excerpt; no transition changes.",
+      "sha256": "345cfd94db03cf0b3820aa468f3f07a79b778bea36c27c9d69c5dcbb42d5fd89"
+    },
+    {
+      "slug": "journey-seek-magic",
+      "title": "Journey \u2192 Seek Magic",
+      "frames": 210,
+      "duration": 7.0,
+      "junction_time": 4.0,
+      "context_before": 4.0,
+      "context_after": 3.0,
+      "stored_master_context": [
+        16.166666666666668,
+        23.166666666666668
+      ],
+      "provenance": "Existing stored master excerpt; no transition changes.",
+      "sha256": "b965167102d663a1aec59bd8eefef355c916150a90c5671b37153c1e669ed7c3"
+    },
+    {
+      "slug": "seek-magic-ophelia",
+      "title": "Seek Magic \u2192 Ophelia",
+      "frames": 195,
+      "duration": 6.5,
+      "junction_time": 3.0,
+      "context_before": 3.0,
+      "context_after": 3.5,
+      "stored_master_context": [
+        21.666666666666668,
+        28.166666666666668
+      ],
+      "provenance": "Existing Seek Magic frames and current Ophelia composition/optical event; only Ophelia source in-point changes to 9s.",
+      "sha256": "e060603b34e26e932910f3424f7bc92b2d4ae054f899f891432f92005fdd5167",
+      "incoming_source": "ophelia_landing_916_web.mp4",
+      "incoming_source_range": [
+        9,
+        12.5
+      ]
+    },
+    {
+      "slug": "shila-burton",
+      "title": "Shila \u2192 Burton",
+      "frames": 210,
+      "duration": 7.0,
+      "junction_time": 3.0,
+      "context_before": 3.0,
+      "context_after": 4.0,
+      "stored_master_context": [
+        42.3,
+        49.3
+      ],
+      "provenance": "Existing stored master excerpt; no transition changes.",
+      "sha256": "5d907c99a92554ee26c4e396cfeaa3c0be52a39584f1cff686eae87826a56242"
+    }
+  ]
+}
