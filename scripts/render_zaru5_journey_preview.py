@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Only Zaru 5 → Journey: emerald concentration, tiny lilac orb, plant contact.
+"""Only Zaru 5 → Journey: green release, depth passage, live plant contact.
 
 The latest direction explicitly allows a tiny travelling orb, not a beam.
 Its core size and fringe color are measured from the real Journey frame.
@@ -21,12 +21,14 @@ W, H, FPS = 1920, 1080, 30
 SOURCE = ROOT/'zaru5.mp4'
 JOURNEY = ROOT/'Journey:Yez Startle video.mp4'
 OUT = ROOT/'public/previews/zaru5-journey'
-DISPLAY_SCALE = 1.35  # Constant for every Zaru frame; no added animated zoom.
+DISPLAY_SCALE = 1.40  # Slightly larger static display, never an animated zoom.
 GREEN_START_FRAME = 390  # 13.00s, the real green material is already moving.
 MATCH_EXIT_FRAMES = 45  # 1.50s native-light / native-detail resolution.
-PLANT_POINT = np.array([912., 641.], np.float32)  # Native point + 1px source pad.
-ORB_FORM_FRAMES = 13
-ORB_TRAVEL_FRAMES = 16
+PLANT_POINT = np.array([651., 625.], np.float32)  # Plant under the reaching hand, +1px pad.
+ORB_FORM_FRAMES = 21  # 0.70s green concentration, readable before release.
+ORB_TRAVEL_FRAMES = 60  # 2.00s overlapping passage and environment resolution.
+JOURNEY_ENTRY_DELAY = 6  # Environment begins 0.20s after the green orb leaves.
+CONTACT_FRAMES = 9
 cv2.setNumThreads(2)
 
 
@@ -91,10 +93,34 @@ def display_zaru(frame):
     return larger[y:y+H,x:x+W]
 
 
+def analyse_plant():
+    """Track the actual moving luminous plant tip; not an unrelated firefly."""
+    point = PLANT_POINT.copy()
+    points = []
+    for source in decode(JOURNEY,pad=True):
+        x,y = np.rint(point).astype(int)
+        x0,y0 = x-30,y-28
+        patch = source[y0:y+29,x0:x+31].astype(np.float32)
+        r,g,b = patch.transpose(2,0,1)
+        yy,xx = np.mgrid[y0:y+29,x0:x+31]
+        luminous = (b>150)&(g>130)&(b>r*.95)&(b>g*.96)
+        proximity = np.exp(-((xx-point[0])**2+(yy-point[1])**2)/(2*16**2))
+        weights = ((r*.2126+g*.7152+b*.0722)/255)**8*luminous*proximity
+        if weights.sum()>.01:
+            point = np.array([(weights*xx).sum()/weights.sum(),
+                              (weights*yy).sum()/weights.sum()],np.float32)
+        points.append(point.copy())
+    return cv2.GaussianBlur(np.asarray(points,np.float32),(1,7),0)
+
+
 class EmeraldPlantMatch:
-    def __init__(self, measured, journey_start, plant_reference):
+    def __init__(self, measured, journey_start, plant_reference, plant_points):
         self.journey_start = journey_start
-        self.anchor = (measured[-8:].mean(axis=0)-[W/2,H/2])*DISPLAY_SCALE+[W/2,H/2]
+        self.travel_start = GREEN_START_FRAME+ORB_FORM_FRAMES
+        self.arrival = self.travel_start+ORB_TRAVEL_FRAMES
+        self.origins = (measured-[W/2,H/2])*DISPLAY_SCALE+[W/2,H/2]
+        self.anchor = self.origins[self.travel_start].copy()
+        self.plant_points = plant_points
         self.y,self.x = np.mgrid[:H,:W].astype(np.float32)
         r,g,b = plant_reference.astype(np.float32).transpose(2,0,1)
         yellow = ((r>170)&(g>140)&(b<g*.8)&(r>g*.95)).astype(np.uint8)
@@ -106,55 +132,52 @@ class EmeraldPlantMatch:
         fringe = (distance>2)&(distance<6)&(b>r*1.08)&(b>g*1.08)
         sample = np.median(plant_reference[fringe],axis=0).astype(np.float32)
         self.lilac = sample/sample.max()
-        self.travel_start = journey_start-ORB_TRAVEL_FRAMES
 
-    def orb(self,point,amount=1.,color=None):
+    def orb(self,point,amount=1.,color=None,scale=1.):
         """A firefly-size point only: no line, trail, streak or large flare."""
         field = np.zeros((H,W,3),np.float32)
-        # Limit the entire optical footprint to 36×36 pixels (0.063% canvas).
-        x0,y0 = np.floor(point-18).astype(int)
-        x1,y1 = x0+36,y0+36
+        # Even at closest approach the core is <12px, with no long trail.
+        radius = int(np.ceil(18*scale))
+        x0,y0 = np.floor(point-radius).astype(int)
+        x1,y1 = x0+radius*2,y0+radius*2
         distance2 = (self.x[y0:y1,x0:x1]-point[0])**2+(self.y[y0:y1,x0:x1]-point[1])**2
-        sigma = self.core_diameter/2.355
+        sigma = self.core_diameter/2.355*scale
         core = np.exp(-distance2/(2*sigma*sigma))
-        halo = np.exp(-distance2/(2*5.5**2))*.09
+        halo = np.exp(-distance2/(2*(5.5*scale)**2))*.09
         fringe = self.lilac if color is None else np.asarray(color)
-        center = fringe*.24+np.array([.77,.79,.84],np.float32)
-        field[y0:y1,x0:x1] = (core[...,None]*center*.88+halo[...,None]*fringe)*amount
+        # Colored core, not the old white dot with only a colored fringe.
+        center = fringe*.80+np.array([.10,.10,.10],np.float32)
+        field[y0:y1,x0:x1] = (core[...,None]*center+halo[...,None]*fringe)*amount
         return np.clip(field,0,1)
 
     def zaru_frame(self,index,source):
-        if index < GREEN_START_FRAME:
-            return source
-        formed = float(smooth((index-GREEN_START_FRAME)/ORB_FORM_FRAMES))
-        color_mix = float(smooth((index-GREEN_START_FRAME-3)/9))
-        # Green only during concentration inside the stone; blue/lilac before
-        # release, sampled from the native plant fringe, not a green projectile.
-        color = np.array([.12,.92,.42])*(1-color_mix)+self.lilac*color_mix
-        travel = float(smooth((index-self.travel_start)/(ORB_TRAVEL_FRAMES-1)))
-        point = self.anchor*(1-travel)+PLANT_POINT*travel
-        point[1] -= 3*np.sin(travel*np.pi)  # A tiny elegant arc, never a tail.
+        if source is None:
+            return np.zeros((H,W,3),np.float32)
         rgb = source.astype(np.float32)/255
-        # Concentrate within the stone, leaving the pendant's geometry intact.
-        local = np.exp(-((self.x-self.anchor[0])**2+(self.y-self.anchor[1])**2)/(2*12**2))
-        rgb = 1-(1-rgb)*(1-local[...,None]*color*formed*.055)
-        # The original object is photographed normally, then leaves through a
-        # brief focus/exposure falloff while the tiny orb travels. No deformation
-        # and no incoming image inside or behind the pendant.
-        if travel > 0:
-            focused = cv2.GaussianBlur(rgb,(0,0),.1+travel*2.5)
-            rgb = focused*(1-travel)
-        light = self.orb(point,formed,color)
-        return np.clip((1-(1-rgb)*(1-light))*255,0,255)
+        if index < GREEN_START_FRAME:
+            return rgb
+        formed = float(smooth((index-GREEN_START_FRAME)/ORB_FORM_FRAMES))
+        origin = self.origins[min(index,len(self.origins)-1)]
+        local = np.exp(-((self.x-origin[0])**2+(self.y-origin[1])**2)/(2*10**2))
+        rgb = 1-(1-rgb)*(1-local[...,None]*np.array([.10,.95,.32])*formed*.16)
+        # Only the outgoing shot loses exposure. The orb has its own continuous
+        # clock across this source boundary; the pendant is never warped.
+        exposure = float(smooth((index-self.travel_start)/(len(self.origins)-1-self.travel_start)))
+        if exposure > 0:
+            rgb = cv2.GaussianBlur(rgb,(0,0),.1+exposure*1.7)*(1-exposure)
+        return rgb
 
     def journey_frame(self,j,source):
+        if source is None:
+            return np.zeros((H,W,3),np.float32)
         if j >= MATCH_EXIT_FRAMES:
-            return source
+            return source.astype(np.float32)/255
         p = float(np.clip(j/MATCH_EXIT_FRAMES,0,1))
         rgb = source.astype(np.float32)/255
         luminance = rgb[...,0]*.2126+rgb[...,1]*.7152+rgb[...,2]*.0722
-        proximity = np.exp(-.5*((self.x-PLANT_POINT[0])/145)**2
-                           -.5*((self.y-PLANT_POINT[1])/145)**2)
+        point = self.plant_points[j]
+        proximity = np.exp(-.5*((self.x-point[0])/145)**2
+                           -.5*((self.y-point[1])/145)**2)
         # Actual luminous stems/leaves resolve before their midtone environment.
         # This is a native-image luminance key, not an expanding geometric wipe.
         score = np.clip(luminance*.72+proximity*.28,0,1)
@@ -165,11 +188,40 @@ class EmeraldPlantMatch:
         clarity = visibility**1.4
         low = cv2.GaussianBlur(rgb,(0,0),7*(1-p)+.10)
         resolved = (low*(1-clarity[...,None])+rgb*clarity[...,None])*visibility[...,None]
-        # Arrival is the first possible incoming frame. The same tiny point
-        # becomes the real plant light as its surrounding native texture opens.
-        # Contact has no flash, bloom expansion or second travelling effect.
-        carry = self.orb(PLANT_POINT,1-smooth(p/.50))
-        return np.clip((1-(1-resolved)*(1-carry))*255,0,255)
+        return resolved
+
+    def orb_state(self,index):
+        formed = float(smooth((index-GREEN_START_FRAME)/ORB_FORM_FRAMES))
+        travel = float(np.clip((index-self.travel_start)/ORB_TRAVEL_FRAMES,0,1))
+        color_mix = float(smooth((travel-.10)/.55))
+        color = np.array([.10,.95,.32])*(1-color_mix)+self.lilac*color_mix
+        j = int(np.clip(index-self.journey_start,0,len(self.plant_points)-1))
+        target = self.plant_points[j]
+        progress = float(smooth(travel))
+        if index < self.travel_start:
+            point = self.origins[min(index,len(self.origins)-1)].copy()
+            size = .55+.45*formed
+        else:
+            # Project a shallow 3D passage: a modest approach to camera then
+            # recession into the native plant plane, with no streak or beam.
+            depth = .24*np.sin(travel*np.pi)
+            size = 1/(1-depth)
+            world = self.anchor*(1-progress)+target*progress
+            world[1] -= 14*np.sin(travel*np.pi)
+            point = np.array([W/2,H/2])+(world-[W/2,H/2])*size
+        amount = formed*(1-float(smooth((index-self.arrival)/CONTACT_FRAMES)))
+        return point,color,size,amount
+
+    def frame(self,index,zaru,journey):
+        outgoing = self.zaru_frame(index,zaru)
+        incoming = self.journey_frame(index-self.journey_start,journey)
+        # Only a few very dark incoming frames overlap the outgoing source.
+        # No incoming miniature in the stone; the environment is always 1:1.
+        rgb = 1-(1-outgoing)*(1-incoming)
+        if GREEN_START_FRAME <= index < self.arrival+CONTACT_FRAMES:
+            point,color,size,amount = self.orb_state(index)
+            rgb = 1-(1-rgb)*(1-self.orb(point,amount,color,size))
+        return np.clip(rgb*255,0,255)
 
 
 def main():
@@ -181,10 +233,11 @@ def main():
     hashes = {p.name: sha(p) for p in [SOURCE, JOURNEY]}
     measured = analyse_emerald()
     native_frames = len(measured)
-    journey_start = native_frames  # Journey begins once, only after orb arrival.
+    plant_points = analyse_plant()
+    journey_start = GREEN_START_FRAME+ORB_FORM_FRAMES+JOURNEY_ENTRY_DELAY
     journey = decode(JOURNEY, pad=True)
     first_journey = next(journey)
-    bridge = EmeraldPlantMatch(measured, journey_start, first_journey)
+    bridge = EmeraldPlantMatch(measured, journey_start, first_journey,plant_points)
     OUT.mkdir(parents=True, exist_ok=True)
     output = OUT/'preview.mp4'
     encoder = subprocess.Popen(['ffmpeg', '-v', 'error', '-f', 'rawvideo',
@@ -193,7 +246,7 @@ def main():
         '-c:v', 'libx264', '-threads', '3', '-preset', 'medium', '-crf', '17',
         '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709',
         '-g', '30', '-movflags', '+faststart', '-y', str(output)], stdin=subprocess.PIPE)
-    count, journey_frames = 0, 0
+    count, journey_frames, zaru_frames = 0, 0, 0
     def write(frame):
         nonlocal count
         encoder.stdin.write(np.clip(frame, 0, 255).astype('uint8').tobytes())
@@ -201,20 +254,23 @@ def main():
         if count%90 == 0:
             print(f'Rendered Zaru 5 / Journey preview {count/FPS:.1f}s', flush=True)
     try:
-        for i, source in enumerate(decode(SOURCE)):
-            source = display_zaru(source)
-            frame = bridge.zaru_frame(i, source)
-            if i in [0, 240, GREEN_START_FRAME, 410, 413, 416, 419, 421, 422]:
+        zaru_stream = decode(SOURCE)
+        journey_stream = itertools.chain([first_journey],journey)
+        for i in range(journey_start+len(plant_points)):
+            zaru = journey_source = None
+            if i < native_frames:
+                zaru = display_zaru(next(zaru_stream))
+                zaru_frames += 1
+            if i >= journey_start:
+                journey_source = next(journey_stream)
+                journey_frames += 1
+            frame = bridge.frame(i,zaru,journey_source)
+            if i in [0,240,390,402,410,411,416,417,421,422,423,429,438,447,456,462,470,471,475,480,517,566]:
                 Image.fromarray(np.clip(frame, 0, 255).astype('uint8')).save(args.qa/f'{i:04d}.png')
             write(frame)
-        assert count == native_frames
-        for j, source in enumerate(itertools.chain([first_journey],journey)):
-            i = journey_start+j
-            frame = bridge.journey_frame(j, source)
-            if j in [0, 1, 3, 8, 12, 19, 25, 34, 44, 45, 100]:
-                Image.fromarray(np.clip(frame, 0, 255).astype('uint8')).save(args.qa/f'{i:04d}.png')
-            write(frame)
-            journey_frames += 1
+        assert zaru_frames == native_frames
+        assert next(zaru_stream,None) is None
+        assert next(journey_stream,None) is None
     finally:
         encoder.stdin.close()
     assert encoder.wait() == 0
@@ -222,24 +278,31 @@ def main():
     assert hashes == {p.name: sha(p) for p in [SOURCE, JOURNEY]}
     meta = {'width': W, 'height': H, 'fps': FPS, 'frames': count, 'duration': count/FPS,
         'zaru_source': SOURCE.name, 'zaru_source_in': 0, 'zaru_frames': native_frames,
-        'zaru_presentation': 'Whole-source constant 1.35 display size, centered, original motion and black negative space preserved.',
+        'zaru_presentation': 'Whole-source constant 1.40 display size, centered, original motion and black negative space preserved.',
         'additional_zaru_scale': DISPLAY_SCALE, 'zaru_scale_animated': False,
         'black_margin_trim_only': True, 'object_crop': False,
         'additional_zaru_camera_motion': False, 'source_pixel_displacement': False,
         'green_motion_start': GREEN_START_FRAME/FPS, 'journey_start': journey_start/FPS,
-        'match_clear': (journey_start+MATCH_EXIT_FRAMES)/FPS,
-        'source_clock_overlap_frames': 0,
+        'match_clear': (bridge.arrival+CONTACT_FRAMES)/FPS,
+        'journey_resolution_clear': (journey_start+MATCH_EXIT_FRAMES)/FPS,
+        'source_clock_overlap_frames': native_frames-journey_start,
         'journey_source_in': 0, 'journey_frames': journey_frames,
         'journey_padding': [1, 0, 1, 0], 'journey_clock': 'Single forward pass, no restart or duplicate sequence.',
-        'bridge': 'Emerald energy concentrates → tiny blue/lilac orb → short clean travel → plant contact → native luminance/detail resolution of Journey.',
+        'bridge': 'Green concentration → green orb release → 2s depth passage with green-to-blue shift and progressive live Journey resolution → moving plant contact.',
         'match_anchor': bridge.anchor.tolist(), 'native_plant_point': PLANT_POINT.tolist(),
         'orb_formation_start': GREEN_START_FRAME/FPS,
         'orb_formation_end': (GREEN_START_FRAME+ORB_FORM_FRAMES)/FPS,
         'orb_travel_start': bridge.travel_start/FPS,
-        'orb_arrival': (journey_start-1)/FPS,
+        'orb_arrival': bridge.arrival/FPS,
+        'transformation_duration': (bridge.arrival-GREEN_START_FRAME)/FPS,
+        'orb_release_color': [25.5,242.25,81.6],
+        'orb_max_core_diameter': bridge.core_diameter/(1-.24),
+        'orb_depth_projection': 'Shallow perspective projection, maximum 1.316 orb-only scale; source media never animated in scale.',
         'orb_core_diameter': bridge.core_diameter,
         'orb_lilac_fringe_rgb': (bridge.lilac*255).round(3).tolist(),
-        'orb_travel_distance_pixels': float(np.linalg.norm(bridge.anchor-PLANT_POINT)),
+        'orb_travel_distance_pixels': float(np.linalg.norm(bridge.anchor-plant_points[bridge.arrival-journey_start])),
+        'plant_arrival_point': plant_points[bridge.arrival-journey_start].tolist(),
+        'plant_point_tracking': 'Actual luminous plant beneath the reaching hand; native source motion, not a floating background particle.',
         'orb_tail': False, 'orb_flash': False,
         'journey_initial_offset': [0,0], 'journey_additional_scale': 1,
         'journey_recenter_frames': 0,
