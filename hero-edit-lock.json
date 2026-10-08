@@ -1,0 +1,29 @@
+{
+  "ophelia": {
+    "source": "ophelia_landing_916_web.mp4",
+    "source_in_seconds": 9.0,
+    "red_stone_event_source_seconds": 13.0
+  },
+  "ophelia_to_shila": {
+    "locked": true,
+    "approved_commit": "26ad392b12ecf279fa61383762ba9c80080c6a18",
+    "approved_preview": "public/previews/shila-handoff/preview.mp4",
+    "timing_scope": "Source in-point changes to 9s; the approved transition, camera, smoke, framing, color and clock-motion implementation remain byte-identical.",
+    "sha256": {
+      "public/previews/shila-handoff/index.html": "93ba10647d1fa887c90e7c88d7d36edb523c86d01652110d1c27d49d4e118306",
+      "public/previews/shila-handoff/preview.mp4": "153739450483b4c37c2b6b93170ecd9282fc0778d0e61a513c9c95b0054c5f7c",
+      "public/previews/shila-handoff/preview.json": "3b9491c91bc93247606ea3cd4e7f9eaac6eb85005b62f4e4024be5be3bb43138",
+      "public/previews/shila-handoff/poster.jpg": "0ca288282ba32a0fd9197502a9b0bcb821504acc9df75f99cf6c5b8aeb2c9594",
+      "scripts/red_smoke_bridge.py": "b39dd97fd587d22719c3fc96644efd52b67a68a32ea404634a01b8f3fa600d7b",
+      "scripts/render_shila_handoff_preview.py": "61c46ccc4105b407c331d194efbf7d1ac651e6da176b6720f3b90fc49b637c06",
+      "shila_original.png": "54531cb4b0b3edfe01e888368f359a639adedcdedb29f3690a719cf982ed40d5",
+      "shila_final.mp4": "790f8e1c281ead69142981bd5d26fb39314bb27d9302a598397956a666110f3d"
+    }
+  },
+  "remaining_junctions": {
+    "review_only": true,
+    "zaru_to_journey_intent": "Existing emerald movement; no stone portal, beam, or additional Zaru zoom.",
+    "shila_to_burton_intent": "Exact Shila-eye to Burton-eye alignment.",
+    "burton_to_maker": "Original uninterrupted yez_ekran_final_web.mp4 source footage."
+  }
+}
