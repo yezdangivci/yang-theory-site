@@ -18,16 +18,24 @@
       "frames": 573,
       "duration": 19.1,
       "junction_time": 14.1,
-      "green_motion_start": 12.4,
-      "provenance": "Current Zaru 5 fixed-size enlargement and local emerald-to-plant light preview. Prior fog and stone-inset edits are superseded.",
+      "green_motion_start": 13.0,
+      "provenance": "Current screen-space match of real emerald and plant light. No travelling light; native luminance and detail resolve the environment.",
       "source": "zaru5.mp4",
       "source_in": 0,
-      "additional_scale": 1.2,
+      "additional_scale": 1.35,
       "crop": false,
       "additional_camera_motion": false,
-      "sha256": "10eb69cfa795423e25d3770a24fe13dbc41a30305aa80378b78cf58ed2c921d5",
-      "light_clear": 14.733333333333333,
-      "scale_animated": false
+      "sha256": "cb04dcc6b72dda12d23cebc460e4d0ee38103cae68baa0a2e6a07f1d09ed4e80",
+      "scale_animated": false,
+      "match_clear": 15.6,
+      "match_anchor": [
+        994.0039489746093,
+        615.880728149414
+      ],
+      "journey_initial_offset": [
+        83.00394897460933,
+        -25.11927185058596
+      ]
     },
     {
       "slug": "journey-seek-magic",
