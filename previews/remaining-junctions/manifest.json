@@ -15,36 +15,43 @@
       "slug": "zaru-journey",
       "title": "Zaru 5 → Journey",
       "file": "../zaru5-journey/preview.mp4",
-      "frames": 573,
-      "duration": 19.1,
-      "junction_time": 14.1,
+      "frames": 567,
+      "duration": 18.9,
+      "junction_time": 15.7,
       "green_motion_start": 13.0,
-      "provenance": "Emerald energy concentrates → tiny blue/lilac orb → short clean travel → plant contact → native luminance/detail resolution of Journey.",
+      "provenance": "Green concentration → green orb release → 2s depth passage with green-to-blue shift and progressive live Journey resolution → moving plant contact.",
       "source": "zaru5.mp4",
       "source_in": 0,
-      "additional_scale": 1.35,
+      "additional_scale": 1.4,
       "crop": false,
       "additional_camera_motion": false,
-      "sha256": "49660e51fe20e0396d70b662e4179a11282319b85648d25a114931124cb4ceda",
+      "sha256": "1bf856b9a03e2183bd593527dbb50f631430122570a7bc7cb48f61d3ffc0bae4",
       "scale_animated": false,
-      "match_clear": 15.6,
+      "match_clear": 16.0,
       "match_anchor": [
-        994.0039489746093,
-        615.880728149414
+        995.3635009765625,
+        618.5759399414062
       ],
       "journey_initial_offset": [
         0,
         0
       ],
       "orb_formation_start": 13.0,
-      "orb_formation_end": 13.433333333333334,
-      "orb_travel_start": 13.566666666666666,
-      "orb_arrival": 14.066666666666666,
+      "orb_formation_end": 13.7,
+      "orb_travel_start": 13.7,
+      "orb_arrival": 15.7,
       "orb_core_diameter": 8.743416490252569,
       "native_plant_point": [
-        912.0,
-        641.0
-      ]
+        651.0,
+        625.0
+      ],
+      "plant_arrival_point": [
+        652.0947265625,
+        639.85498046875
+      ],
+      "journey_start": 13.9,
+      "journey_resolution_clear": 15.4,
+      "transformation_duration": 2.7
     },
     {
       "slug": "journey-seek-magic",
